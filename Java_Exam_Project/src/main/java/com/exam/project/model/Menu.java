@@ -5,8 +5,8 @@ import com.exam.project.composite.*;
 import com.exam.project.factory.Character;
 import com.exam.project.builder.*;
 import com.exam.project.factory.*;
+import com.exam.project.factoryMonster.MonsterFactory;
 import com.exam.project.iterator.*;
-import com.exam.project.security.ExceptionHandler;
 import com.exam.project.security.InputValidator;
 
 import java.util.Scanner;
@@ -17,13 +17,13 @@ public class Menu {
 
     // Game state
     private static Character currentCharacter = null;
-    private static List<Character> allCharacters = new ArrayList<>();
-    private static Scanner scanner = new Scanner(System.in);
+    private static final List<Character> allCharacters = new ArrayList<>();
+    private static final Scanner scanner = new Scanner(System.in);
 
     // Factories and utilities
-    private static CharacterFactory characterFactory = new CharacterFactory();
-    private static DungeonFactory dungeonFactory = new DungeonFactory();
-    private static DungeonExplorer dungeonExplorer = new DungeonExplorer();
+    private static final CharacterFactory characterFactory = new CharacterFactory();
+    private static final DungeonFactory dungeonFactory = new DungeonFactory();
+    private static final DungeonExplorer dungeonExplorer = new DungeonExplorer();
 
     public static void main(String[] args) {
         System.out.println("=== WELCOME TO THE RPG ADVENTURE GAME ===");
@@ -48,9 +48,9 @@ public class Menu {
         GameMenu mainMenu = new GameMenu("Main Menu");
 
         // Add menu items - each with a name and an action (lambda expression)
-        mainMenu.add(new MenuItem("Create New Character", App::createCharacter));
-        mainMenu.add(new MenuItem("Select Character", App::selectCharacter));
-        mainMenu.add(new MenuItem("Show Current Character", App::showCurrentCharacter));
+        mainMenu.add(new MenuItem("Create New Character", Menu::createCharacter));
+        mainMenu.add(new MenuItem("Select Character", Menu::selectCharacter));
+        mainMenu.add(new MenuItem("Show Current Character", Menu::showCurrentCharacter));
 
         // Create and add the Play submenu
         GameMenu playMenu = buildPlayMenu();
@@ -107,14 +107,10 @@ public class Menu {
     private static GameMenu buildCharacterMenu() {
         GameMenu characterMenu = new GameMenu("Character Management");
 
-        characterMenu.add(new MenuItem("List All Characters", App::listAllCharacters));
-        characterMenu.add(new MenuItem("Delete Character", App::deleteCharacter));
-        characterMenu.add(new MenuItem("Save Character", () -> {
-            System.out.println("Save feature coming soon!");
-        }));
-        characterMenu.add(new MenuItem("Load Character", () -> {
-            System.out.println("Load feature coming soon!");
-        }));
+        characterMenu.add(new MenuItem("List All Characters", Menu::listAllCharacters));
+        characterMenu.add(new MenuItem("Delete Character", Menu::deleteCharacter));
+        characterMenu.add(new MenuItem("Save Character", () -> System.out.println("Save feature coming soon!")));
+        characterMenu.add(new MenuItem("Load Character", () -> System.out.println("Load feature coming soon!")));
 
         return characterMenu;
     }
@@ -125,8 +121,8 @@ public class Menu {
     private static GameMenu buildTestMenu() {
         GameMenu testMenu = new GameMenu("Test Features");
 
-        testMenu.add(new MenuItem("Test Battle System", App::testBattle));
-        testMenu.add(new MenuItem("Test Item System", App::testItems));
+        testMenu.add(new MenuItem("Test Battle System", Menu::testBattle));
+        testMenu.add(new MenuItem("Test Item System", Menu::testItems));
         testMenu.add(new MenuItem("Show Factory Types", () -> {
             characterFactory.showAvailableTypes();
             System.out.println();
