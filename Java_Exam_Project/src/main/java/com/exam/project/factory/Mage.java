@@ -1,5 +1,7 @@
 package com.exam.project.factory;
 
+import com.exam.project.iterator.Item;
+
 import java.util.Random;
 
 /**
@@ -62,6 +64,32 @@ public class Mage extends AbstractCharacter {
     super.rest();  // Call parent rest method for health and stamina
     this.mana = maxMana;  // Also restore mana
     System.out.printf("%s meditates and restores mana!%n", name);
+  }
+
+/**
+*
+ * @param sword
+*/
+  @Override
+  public void equipItem(Item sword) {
+
+  }
+
+/**
+*
+ * @param sword
+*/
+  @Override
+  public void addItem(Item sword) {
+
+  }
+
+/**
+*
+*/
+  @Override
+  public void showInventory() {
+
   }
 
   /**

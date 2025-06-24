@@ -1,5 +1,7 @@
 package com.exam.project.factory;
 
+import com.exam.project.iterator.Item;
+
 import java.util.Random;
 
 /**
@@ -29,6 +31,21 @@ public class Warrior extends AbstractCharacter {
         System.out.printf("%s swings their weapon for %d damage!%n", name, damage);
 
         return damage;
+    }
+
+    @Override
+    public void equipItem(Item sword) {
+
+    }
+
+    @Override
+    public void addItem(Item sword) {
+
+    }
+
+    @Override
+    public void showInventory() {
+
     }
 
     @Override
