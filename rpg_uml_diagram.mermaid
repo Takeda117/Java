@@ -1,0 +1,304 @@
+classDiagram
+    %% Core Character System (Factory Pattern)
+    class Character {
+        <<interface>>
+        +attack() int
+        +takeDamage(damage: int)
+        +isAlive() boolean
+        +train()
+        +getName() String
+        +getHealth() int
+        +getMaxHealth() int
+        +getStamina() int
+        +getMaxStamina() int
+        +getBaseDamage() int
+        +getMoney() int
+        +getLevel() int
+        +restoreStamina(amount: int)
+        +rest()
+    }
+
+    class AbstractCharacter {
+        <<abstract>>
+        #name: String
+        #level: int
+        #money: int
+        #statsManager: StatsManager
+        #inventory: Inventory
+        +AbstractCharacter(name: String, baseHealth: int, baseStamina: int, baseDamage: int)
+        +attack() int
+        +takeDamage(damage: int)
+        +isAlive() boolean
+        +train()
+        +rest()
+        +equipItem(item: Item)
+        +unequipItem(item: Item)
+        #performTraining()* void
+        +addObserver(observer: StaminaObserver)
+        +notifyObservers()
+    }
+
+    class Warrior {
+        +Warrior(name: String)
+        +attack() int
+        #performTraining() void
+        +getStaminaRecoveryRate() double
+    }
+
+    class Mage {
+        -mana: int
+        -maxMana: int
+        +Mage(name: String)
+        +attack() int
+        #performTraining() void
+        +getMana() int
+        +getMaxMana() int
+        +getStaminaRecoveryRate() double
+    }
+
+    class CharacterFactory {
+        +createCharacter(type: String, name: String) Character
+        +createCharacter(type: CharacterType, name: String) Character
+    }
+
+    class CharacterType {
+        <<enumeration>>
+        WARRIOR
+        MAGE
+        +getDescription() String
+    }
+
+    %% Stats System
+    class StatsManager {
+        -baseStats: Map~StatType, Integer~
+        -equipmentModifiers: Map~StatType, Integer~
+        +setBaseStat(type: StatType, value: int)
+        +addEquipmentBonus(type: StatType, bonus: int)
+        +removeEquipmentBonus(type: StatType)
+        +getFinalStat(type: StatType) int
+        +getAllStats() Map~StatType, Integer~
+    }
+
+    class StatType {
+        <<enumeration>>
+        HEALTH
+        MAX_HEALTH
+        STAMINA
+        MAX_STAMINA
+        DAMAGE
+        DEFENSE
+        +getDisplayName() String
+    }
+
+    %% Inventory System (Composite Pattern)
+    class InventoryComponent {
+        <<abstract>>
+        +getName() String
+        +getValue() int
+        +getType() ItemType
+        +add(component: InventoryComponent)* void
+        +remove(component: InventoryComponent)* void
+        +getChild(index: int)* InventoryComponent
+        +iterator() Iterator~InventoryComponent~
+    }
+
+    class Item {
+        -name: String
+        -value: int
+        -type: ItemType
+        -statBonuses: Map~StatType, Integer~
+        +Item(name: String, value: int, type: ItemType)
+        +getName() String
+        +getValue() int
+        +getType() ItemType
+        +getStatBonus(stat: StatType) int
+        +isEquippable() boolean
+        +iterator() Iterator~InventoryComponent~
+    }
+
+    class ItemContainer {
+        -name: String
+        -items: List~InventoryComponent~
+        +ItemContainer(name: String)
+        +add(component: InventoryComponent)
+        +remove(component: InventoryComponent)
+        +getChild(index: int) InventoryComponent
+        +getValue() int
+        +iterator() Iterator~InventoryComponent~
+    }
+
+    class Inventory {
+        -items: List~InventoryComponent~
+        -maxCapacity: int
+        +addItem(item: InventoryComponent) boolean
+        +removeItem(item: InventoryComponent) boolean
+        +findItemsByType(type: ItemType) List~Item~
+        +getTotalValue() int
+        +iterator() Iterator~InventoryComponent~
+        +getEquippedItems() List~Item~
+        +sellItem(item: Item) int
+    }
+
+    class ItemType {
+        <<enumeration>>
+        WEAPON
+        ARMOR
+        POTION
+        CONTAINER
+        MISC
+    }
+
+    %% Combat System (Strategy Pattern)
+    class CombatStrategy {
+        <<interface>>
+        +calculateDamage(attacker: Character) int
+        +getStaminaCost() int
+    }
+
+    class WarriorCombatStrategy {
+        +calculateDamage(attacker: Character) int
+        +getStaminaCost() int
+    }
+
+    class MageCombatStrategy {
+        +calculateDamage(attacker: Character) int
+        +getStaminaCost() int
+    }
+
+    class CombatSystem {
+        +battle(player: Character, enemy: Monster) BattleResult
+        +calculateDamage(attacker: Character, defender: Character) int
+        -applyCombatStrategy(character: Character) CombatStrategy
+    }
+
+    class Monster {
+        -name: String
+        -health: int
+        -damage: int
+        -dropItems: List~Item~
+        +Monster(name: String, health: int, damage: int)
+        +attack() int
+        +takeDamage(damage: int)
+        +isAlive() boolean
+        +getDropItems() List~Item~
+    }
+
+    class BattleResult {
+        -victory: boolean
+        -experience: int
+        -droppedItems: List~Item~
+        -goldReward: int
+        +BattleResult(victory: boolean, exp: int, items: List~Item~, gold: int)
+    }
+
+    %% Stamina Recovery System (Observer + Multithreading)
+    class StaminaObserver {
+        <<interface>>
+        +onStaminaChanged(character: Character, newStamina: int)
+    }
+
+    class StaminaRecoveryTimer {
+        -timer: Timer
+        -characters: List~Character~
+        +StaminaRecoveryTimer()
+        +addCharacter(character: Character)
+        +removeCharacter(character: Character)
+        +start()
+        +stop()
+        -recoverStamina()
+    }
+
+    class GameUI {
+        +onStaminaChanged(character: Character, newStamina: int)
+        +updateDisplay()
+        +showCharacterStats(character: Character)
+    }
+
+    %% Game Engine (Singleton Pattern)
+    class GameEngine {
+        -instance: GameEngine
+        -currentCharacter: Character
+        -staminaTimer: StaminaRecoveryTimer
+        -gameLogger: Logger
+        -GameEngine()
+        +getInstance() GameEngine
+        +startGame()
+        +createNewCharacter() Character
+        +loadCharacter(filename: String) Character
+        +saveCharacter(character: Character, filename: String)
+        +enterDungeon() BattleResult
+        +openShop()
+        +trainCharacter()
+        +exitGame()
+    }
+
+    %% Exception Handling
+    class GameException {
+        <<abstract>>
+        +GameException(message: String)
+        +GameException(message: String, cause: Throwable)
+    }
+
+    class CharacterCreationException {
+        +CharacterCreationException(message: String)
+    }
+
+    class InventoryException {
+        +InventoryException(message: String)
+    }
+
+    class SaveLoadException {
+        +SaveLoadException(message: String, cause: Throwable)
+    }
+
+    class ExceptionHandler {
+        -logger: Logger
+        +handleException(exception: Exception) void
+        +logAndShowError(message: String)
+        +createSafeErrorMessage(exception: Exception) String
+    }
+
+    %% File I/O System
+    class CharacterPersistence {
+        +saveCharacter(character: Character, filename: String) void
+        +loadCharacter(filename: String) Character
+        +characterExists(filename: String) boolean
+        -serializeCharacter(character: Character) String
+        -deserializeCharacter(data: String) Character
+    }
+
+    %% Relationships
+    Character <|.. AbstractCharacter : implements
+    AbstractCharacter <|-- Warrior : extends
+    AbstractCharacter <|-- Mage : extends
+    CharacterFactory ..> Character : creates
+    CharacterFactory ..> CharacterType : uses
+    
+    AbstractCharacter *-- StatsManager : composition
+    AbstractCharacter *-- Inventory : composition
+    StatsManager ..> StatType : uses
+    
+    InventoryComponent <|-- Item : implements
+    InventoryComponent <|-- ItemContainer : implements
+    Inventory o-- InventoryComponent : aggregation
+    Item ..> ItemType : uses
+    ItemContainer o-- InventoryComponent : aggregation
+    
+    CombatStrategy <|.. WarriorCombatStrategy : implements
+    CombatStrategy <|.. MageCombatStrategy : implements
+    CombatSystem ..> CombatStrategy : uses
+    CombatSystem ..> BattleResult : creates
+    
+    StaminaObserver <|.. GameUI : implements
+    AbstractCharacter ..> StaminaObserver : notifies
+    StaminaRecoveryTimer ..> Character : observes
+    
+    GameEngine ..> CharacterFactory : uses
+    GameEngine ..> StaminaRecoveryTimer : uses
+    GameEngine ..> CombatSystem : uses
+    GameEngine ..> CharacterPersistence : uses
+    
+    GameException <|-- CharacterCreationException : extends
+    GameException <|-- InventoryException : extends
+    GameException <|-- SaveLoadException : extends
+    ExceptionHandler ..> GameException : handles
