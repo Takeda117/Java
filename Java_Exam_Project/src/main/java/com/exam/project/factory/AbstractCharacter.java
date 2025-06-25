@@ -1,16 +1,12 @@
 package com.exam.project.factory;
 
-import com.exam.project.logger.GameLogger;
-import java.util.logging.Logger;
+import com.exam.project.iterator.Item;
 
 /**
- * Abstract base class for all characters with comprehensive crash protection
+ * Base class for all characters
  */
 public abstract class AbstractCharacter implements Character {
-
-    private static final Logger logger = GameLogger.getLogger();
-
-    // Protected fields - subclasses can access these
+    
     protected String name;
     protected int health;
     protected int maxHealth;
@@ -21,115 +17,91 @@ public abstract class AbstractCharacter implements Character {
     protected int level;
 
     /**
-     * Constructor with input validation and crash protection
-     * @param name Character name (will be sanitized)
-     * @param baseHealth Starting health (minimum 1)
-     * @param baseStamina Starting stamina (minimum 1)
-     * @param baseDamage Starting damage (minimum 1)
+     * Constructor
      */
     protected AbstractCharacter(String name, int baseHealth, int baseStamina, int baseDamage) {
-        try {
-            // Sanitize and validate inputs
-            this.name = (name != null && !name.trim().isEmpty()) ? name.trim() : "Unknown Character";
-            this.health = Math.max(1, baseHealth);
-            this.maxHealth = this.health;
-            this.stamina = Math.max(1, baseStamina);
-            this.maxStamina = this.stamina;
-            this.baseDamage = Math.max(1, baseDamage);
-            this.money = 100;  // Safe default
-            this.level = 1;    // Safe default
-
-            logger.info("Character created: " + this.name);
-
-        } catch (Exception e) {
-            // Emergency fallback values
-            logger.severe("Error creating character, using fallback values: " + e.getMessage());
-            this.name = "Error Character";
-            this.health = this.maxHealth = 50;
-            this.stamina = this.maxStamina = 50;
-            this.baseDamage = 5;
-            this.money = 100;
-            this.level = 1;
-        }
+        this.name = (name != null && !name.trim().isEmpty()) ? name.trim() : "Unknown";
+        this.health = Math.max(1, baseHealth);
+        this.maxHealth = this.health;
+        this.stamina = Math.max(1, baseStamina);
+        this.maxStamina = this.stamina;
+        this.baseDamage = Math.max(1, baseDamage);
+        this.money = 100;
+        this.level = 1;
     }
 
     /**
-     * Takes damage with comprehensive bounds checking
+     * Takes damage
      * @param damage Amount of damage to take
      */
     @Override
     public void takeDamage(int damage) {
-        try {
-            if (damage < 0) {
-                System.out.println("Invalid damage amount ignored");
-                logger.warning("Negative damage attempted: " + damage);
-                return;
-            }
+        if (damage < 0) {
+            return;
+        }
 
-            int oldHealth = this.health;
-            this.health = Math.max(0, this.health - damage);
+        this.health = Math.max(0, this.health - damage);
+        System.out.printf("%s takes %d damage! Health: %d/%d%n",
+                name, damage, health, maxHealth);
 
-            // Usa getName() con controllo null
-            String safeName = (name != null) ? name : "Character";
-            System.out.printf("%s takes %d damage! Health: %d/%d%n",
-                    safeName, damage, Math.max(0, health), Math.max(1, maxHealth));
-
-            if (!isAlive()) {
-                System.out.printf("%s has been defeated!%n", safeName);
-                logger.info("Character defeated: " + safeName);
-            }
-
-        } catch (Exception e) {
-            logger.severe("Error in takeDamage: " + e.getMessage());
-            System.out.println("Damage calculation error occurred.");
-            // Assicurati che il personaggio non sia invincibile a causa di un errore
-            if (this.health > 0) {
-                this.health = Math.max(0, this.health - 1);
-            }
+        if (!isAlive()) {
+            System.out.printf("%s has been defeated!%n", name);
         }
     }
 
     /**
-     * Checks if character is alive with error protection
-     * @return true if health > 0, false otherwise or on error
+     * Checks if character is alive
+     * @return true if health > 0, false otherwise
      */
     @Override
     public boolean isAlive() {
-        try {
-            return health > 0;
-        } catch (Exception e) {
-            logger.warning("Error checking if character is alive: " + e.getMessage());
-            return false; // Safe assumption for error state
+        return health > 0;
+    }
+
+    /**
+     * Restores stamina
+     * @param amount Amount of stamina to restore
+     */
+    @Override
+    public void restoreStamina(int amount) {
+        if (amount <= 0) {
+            return;
+        }
+        
+        int oldStamina = stamina;
+        stamina = Math.min(maxStamina, stamina + amount);
+        
+        int restored = stamina - oldStamina;
+        if (restored > 0) {
+            System.out.printf("%s restored %d stamina. Stamina: %d/%d%n", 
+                    name, restored, stamina, maxStamina);
         }
     }
 
     /**
-     * Character training with error protection
+     * Rest to recover stamina
+     */
+    @Override
+    public void rest() {
+        stamina = maxStamina;
+        System.out.printf("%s rests and recovers stamina.%n", name);
+    }
+
+    /**
+     * Train to improve stats
      */
     @Override
     public void train() {
-        try {
-            if (stamina < 10) {
-                String safeName = (name != null) ? name : "Character";
-                System.out.printf("%s doesn't have enough stamina to train!%n", safeName);
-                return;
-            }
-
-            // Perform subclass-specific training
-            performTraining();
-
-            // Common training effects with bounds checking
-            stamina = Math.max(0, stamina - 10);
-            maxStamina = Math.max(10, maxStamina - 2);  // Minimum 10 stamina
-
-            String safeName = (name != null) ? name : "Character";
-            System.out.printf("%s finished training! Stamina: %d/%d%n",
-                    safeName, Math.max(0, stamina), Math.max(1, maxStamina));
-
-        } catch (Exception e) {
-            logger.severe("Error during training: " + e.getMessage());
-            System.out.println("Training failed due to error.");
+        if (money < 50) {
+            System.out.println("Not enough money to train!");
+            return;
         }
+        
+        money -= 50;
+        performTraining();
+        level++;
+        
+        System.out.printf("%s is now level %d!%n", name, level);
     }
 
     /**
@@ -138,111 +110,63 @@ public abstract class AbstractCharacter implements Character {
     protected abstract void performTraining();
 
     /**
-     * Restores stamina with bounds checking
-     * @param amount Amount to restore (negative values will reduce stamina)
+     * Equip an item
+     * @param item The item to equip
      */
     @Override
-    public void restoreStamina(int amount) {
-        try {
-            int oldStamina = this.stamina;
-
-            if (amount >= 0) {
-                // Restoring stamina
-                this.stamina = Math.min(maxStamina, this.stamina + amount);
-            } else {
-                // Consuming stamina (negative amount)
-                this.stamina = Math.max(0, this.stamina + amount);
-            }
-
-            // Optional logging for debugging
-            if (amount != 0) {
-                logger.fine(String.format("Stamina changed from %d to %d (amount: %d)",
-                        oldStamina, stamina, amount));
-            }
-
-        } catch (Exception e) {
-            logger.warning("Error restoring stamina: " + e.getMessage());
-        }
-    }
+    public abstract void equipItem(Item item);
 
     /**
-     * Full rest with error protection
+     * Add an item to inventory
+     * @param item The item to add
      */
     @Override
-    public void rest() {
-        try {
-            this.health = maxHealth;
-            this.stamina = maxStamina;
-            String safeName = (name != null) ? name : "Character";
-            System.out.printf("%s takes a rest and fully recovers!%n", safeName);
-        } catch (Exception e) {
-            logger.warning("Error during rest: " + e.getMessage());
-            System.out.println("Rest completed with some difficulties.");
-        }
-    }
+    public abstract void addItem(Item item);
 
-    // Safe getter methods with bounds checking
+    /**
+     * Show inventory contents
+     */
+    @Override
+    public abstract void showInventory();
+
+    // Getters
     @Override
     public String getName() {
-        return (name != null) ? name : "Unknown";
+        return name;
     }
 
     @Override
     public int getHealth() {
-        return Math.max(0, health);
+        return health;
     }
 
     @Override
     public int getMaxHealth() {
-        return Math.max(1, maxHealth);
+        return maxHealth;
     }
 
     @Override
     public int getStamina() {
-        return Math.max(0, stamina);
+        return stamina;
     }
 
     @Override
     public int getMaxStamina() {
-        return Math.max(1, maxStamina);
+        return maxStamina;
     }
 
     @Override
     public int getBaseDamage() {
-        return Math.max(1, baseDamage);
+        return baseDamage;
     }
 
     @Override
     public int getMoney() {
-        return Math.max(0, money);
+        return money;
     }
 
     @Override
     public int getLevel() {
-        return Math.max(1, level);
-    }
-
-    /**
-     * Crash-safe toString implementation
-     * @return Character description or error message
-     */
-    @Override
-    public String toString() {
-        try {
-            String safeName = (name != null) ? name : "Unknown";
-            int safeHealth = Math.max(0, health);
-            int safeMaxHealth = Math.max(1, maxHealth);
-            int safeStamina = Math.max(0, stamina);
-            int safeMaxStamina = Math.max(1, maxStamina);
-            int safeBaseDamage = Math.max(1, baseDamage);
-            int safeMoney = Math.max(0, money);
-            int safeLevel = Math.max(1, level);
-
-            return String.format("%s [HP: %d/%d, Stamina: %d/%d, Damage: %d, Money: %d, Level: %d]",
-                    safeName, safeHealth, safeMaxHealth, safeStamina, safeMaxStamina,
-                    safeBaseDamage, safeMoney, safeLevel);
-        } catch (Exception e) {
-            return "Character [Error displaying stats]";
-        }
+        return level;
     }
 }

@@ -46,49 +46,32 @@ public class DungeonExplorer {
         }
     }
     
-    /**
-     * Builder method: imposta il personaggio
-     */
+    // Builder methods
     public DungeonExplorer withCharacter(Character character) {
         this.character = character;
         return this;
     }
     
-    /**
-     * Builder method: imposta il dungeon
-     */
     public DungeonExplorer withDungeon(Dungeon dungeon) {
         this.dungeon = dungeon;
         return this;
     }
     
-    /**
-     * Builder method: abilita/disabilita il riposo tra le stanze
-     */
     public DungeonExplorer enableRest(boolean enable) {
         this.enableRest = enable;
         return this;
     }
     
-    /**
-     * Builder method: abilita/disabilita la possibilità di fuggire
-     */
     public DungeonExplorer enableFlee(boolean enable) {
         this.enableFlee = enable;
         return this;
     }
     
-    /**
-     * Builder method: imposta un modificatore di difficoltà
-     */
     public DungeonExplorer withDifficultyModifier(int modifier) {
         this.difficultyModifier = modifier;
         return this;
     }
     
-    /**
-     * Builder method: costruisce e avvia l'esplorazione
-     */
     public boolean build() {
         logger.info("Building dungeon exploration experience");
         
@@ -106,31 +89,22 @@ public class DungeonExplorer {
     public boolean exploreDungeon(Character character, Dungeon dungeon) {
         logger.info("Starting dungeon exploration");
 
-        if (character == null || dungeon == null) {
-            logger.warning("Exploration failed: null character or dungeon");
-            System.out.println("Error: Missing character or dungeon!");
-            return false;
-        }
-
-        if (!character.isAlive()) {
-            logger.warning("Exploration failed: character is dead");
-            System.out.println("Character is dead!");
+        if (character == null || dungeon == null || !character.isAlive()) {
+            logger.warning("Exploration failed: invalid character or dungeon");
+            System.out.println("Error: Cannot start exploration!");
             return false;
         }
 
         logger.info("Character " + character.getName() + " entering " + dungeon.getName());
 
         try {
-            // Show dungeon info
+            // Show dungeon info and confirm entry
             System.out.println("\n=== " + dungeon.getName().toUpperCase() + " ===");
             System.out.println(dungeon.getFullDescription());
             System.out.println("Your character: " + character);
 
-            // Ask for confirmation
             System.out.print("\nEnter this dungeon? (y/n): ");
-            String input = scanner.nextLine();
-
-            if (!InputValidator.validateYesNo(input)) {
+            if (!InputValidator.validateYesNo(scanner.nextLine())) {
                 logger.info("Player cancelled dungeon exploration");
                 System.out.println("Maybe next time...");
                 return false;
@@ -144,10 +118,9 @@ public class DungeonExplorer {
                 System.out.println("\n=== ROOM " + room + " ===");
 
                 try {
-                    // Create monsters for this room
-                    List<AbstractMonster> monsters = createMonsters(dungeon);
-
-                    if (monsters.isEmpty()) {
+                    List<AbstractMonster> monsters = dungeon.createMonstersForRoom();
+                    
+                    if (monsters == null || monsters.isEmpty()) {
                         logger.info("Room " + room + " is empty");
                         System.out.println("This room is empty.");
                         continue;
@@ -170,11 +143,9 @@ public class DungeonExplorer {
                     if (enableRest && room < dungeon.getNumberOfRooms()) {
                         offerRest(character);
                     }
-
                 } catch (Exception e) {
                     logger.severe("Error in room " + room + ": " + e.getMessage());
                     System.out.println("Something went wrong in this room! Continuing...");
-                    continue;
                 }
             }
 
@@ -196,39 +167,10 @@ public class DungeonExplorer {
             }
 
             return true;
-
         } catch (Exception e) {
             logger.severe("Critical error during dungeon exploration: " + e.getMessage());
             System.out.println("A critical error occurred during exploration!");
             return false;
-        }
-    }
-
-    /**
-     * Create monsters for room
-     */
-    private List<AbstractMonster> createMonsters(Dungeon dungeon) {
-        logger.info("Creating monsters for " + dungeon.getName());
-
-        try {
-            if (dungeon == null) {
-                logger.warning("Null dungeon passed to createMonsters");
-                return new ArrayList<>();
-            }
-            
-            // Usa il metodo integrato nel dungeon per creare i mostri
-            List<AbstractMonster> monsters = dungeon.createMonstersForRoom();
-            
-            // Verifica che la lista non sia null
-            if (monsters == null) {
-                logger.warning("Dungeon returned null monster list");
-                return new ArrayList<>();
-            }
-            
-            return monsters;
-        } catch (Exception e) {
-            logger.severe("Error creating monsters: " + e.getMessage());
-            return new ArrayList<>();
         }
     }
 
@@ -248,97 +190,65 @@ public class DungeonExplorer {
 
                 // Player turn
                 System.out.println("\n1. Attack");
-                if (enableFlee) {
-                    System.out.println("2. Try to flee");
-                }
+                if (enableFlee) System.out.println("2. Try to flee");
                 System.out.print("What do you do? ");
 
                 String input;
                 try {
                     input = scanner.nextLine();
                 } catch (Exception e) {
-                    logger.warning("Error reading player input: " + e.getMessage());
-                    System.out.println("Input error! Defaulting to attack.");
                     input = "1";
                 }
 
                 Integer choice = InputValidator.validateMenuChoice(input, enableFlee ? 2 : 1);
 
                 if (choice == null) {
-                    logger.info("Player entered invalid choice");
                     System.out.println("Invalid choice!");
                     continue;
                 }
 
                 if (choice == 1) {
                     // Attack
-                    logger.info("Player chose to attack");
-
                     if (!combatSystem.canFight(character)) {
-                        logger.info("Character too tired to fight");
                         System.out.println("You're too tired to fight!");
                         continue;
                     }
 
-                    try {
-                        AbstractMonster target = monsters.get(0);
-                        int damage = combatSystem.executeAttack(character, target);
+                    AbstractMonster target = monsters.get(0);
+                    int damage = combatSystem.executeAttack(character, target);
 
-                        if (damage > 0) {
-                            logger.info("Player attack successful: " + damage + " damage");
-                            System.out.println("You attack for " + damage + " damage!");
-                        } else {
-                            logger.info("Player attack failed or missed");
-                        }
-                    } catch (Exception e) {
-                        logger.severe("Error during player attack: " + e.getMessage());
-                        System.out.println("Attack failed due to error!");
+                    if (damage > 0) {
+                        logger.info("Player attack successful: " + damage + " damage");
                     }
-
                 } else if (choice == 2 && enableFlee) {
                     // Try to flee
-                    logger.info("Player attempting to flee");
-
-                    try {
-                        if (random.nextInt(100) < 50) {
-                            logger.info("Flee attempt successful");
-                            System.out.println("You escape!");
-                            return false;
-                        } else {
-                            logger.info("Flee attempt failed");
-                            System.out.println("Can't escape!");
-                        }
-                    } catch (Exception e) {
-                        logger.warning("Error during flee attempt: " + e.getMessage());
-                        System.out.println("Escape failed!");
+                    if (random.nextInt(100) < 50) {
+                        logger.info("Flee attempt successful");
+                        System.out.println("You escape!");
+                        return false;
+                    } else {
+                        logger.info("Flee attempt failed");
+                        System.out.println("Can't escape!");
                     }
                 }
 
                 // Remove dead monsters and collect loot
-                try {
-                    for (int i = monsters.size() - 1; i >= 0; i--) {
-                        AbstractMonster monster = monsters.get(i);
-                        if (monster != null && !monster.isAlive()) {
-                            logger.info("Monster defeated: " + monster.getName());
-                            System.out.println("You defeated " + monster.getName() + "!");
-
-                            // Get loot
-                            try {
-                                List<Item> drops = monster.getDroppedItems();
-                                for (Item item : drops) {
-                                    System.out.println("Found: " + item);
-                                    loot.add(item);
-                                    logger.info("Loot collected: " + item.getName());
-                                }
-                            } catch (Exception e) {
-                                logger.warning("Error collecting loot: " + e.getMessage());
+                for (int i = monsters.size() - 1; i >= 0; i--) {
+                    AbstractMonster monster = monsters.get(i);
+                    if (monster != null && !monster.isAlive()) {
+                        logger.info("Monster defeated: " + monster.getName());
+                        
+                        // Get loot
+                        List<Item> drops = monster.getDroppedItems();
+                        if (drops != null) {
+                            for (Item item : drops) {
+                                loot.add(item);
+                                logger.info("Loot collected: " + item.getName());
                             }
-
-                            monsters.remove(i);
                         }
+                        
+                        monsters.remove(i);
                     }
-                } catch (Exception e) {
-                    logger.severe("Error processing defeated monsters: " + e.getMessage());
                 }
 
                 // Monster attacks
@@ -347,25 +257,14 @@ public class DungeonExplorer {
                     System.out.println("\n--- Monster Turn ---");
 
                     for (AbstractMonster monster : monsters) {
-                        try {
-                            if (monster != null && monster.isAlive() && character.isAlive()) {
-                                int damage = combatSystem.executeMonsterAttack(monster, character);
-                                if (damage > 0) {
-                                    logger.info("Monster attack: " + monster.getName() + " deals " + damage + " damage");
-                                    System.out.println(monster.getName() + " attacks you for " + damage + " damage!");
-                                }
-                            }
-                        } catch (Exception e) {
-                            logger.warning("Error during monster attack: " + e.getMessage());
+                        if (monster != null && monster.isAlive() && character.isAlive()) {
+                            combatSystem.executeMonsterAttack(monster, character);
                         }
                     }
                 }
             }
 
-            boolean victory = character.isAlive();
-            logger.info("Combat ended. Player victory: " + victory);
-            return victory;
-
+            return character.isAlive();
         } catch (Exception e) {
             logger.severe("Critical error during combat: " + e.getMessage());
             System.out.println("Combat error occurred!");
@@ -381,11 +280,7 @@ public class DungeonExplorer {
 
         try {
             System.out.print("\nRest to recover stamina? (y/n): ");
-            String input = scanner.nextLine();
-
-            if (InputValidator.validateYesNo(input)) {
-                logger.info("Character chose to rest");
-
+            if (InputValidator.validateYesNo(scanner.nextLine())) {
                 int current = character.getStamina();
                 int max = character.getMaxStamina();
                 int restore = Math.min(20, max - current);
@@ -395,11 +290,8 @@ public class DungeonExplorer {
                     logger.info("Stamina restored: " + restore + " points");
                     System.out.println("Recovered " + restore + " stamina!");
                 } else {
-                    logger.info("Character already at full stamina");
                     System.out.println("Already at full stamina.");
                 }
-            } else {
-                logger.info("Character declined rest");
             }
         } catch (Exception e) {
             logger.warning("Error during rest offer: " + e.getMessage());

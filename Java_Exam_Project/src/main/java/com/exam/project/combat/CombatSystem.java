@@ -18,15 +18,11 @@ public class CombatSystem {
 
     /**
      * Esegue un combattimento tra personaggio e mostro
-     * @param character Il personaggio
-     * @param monster Il mostro
-     * @return Il personaggio (nuovo se è morto)
      */
     public Character doCombat(Character character, AbstractMonster monster) {
         System.out.println("\n=== COMBATTIMENTO ===");
         System.out.println(character.getName() + " vs " + monster.getName());
         
-        // Combattimento a turni finché uno dei due non muore
         while (character.isAlive() && monster.isAlive()) {
             // Turno del personaggio
             System.out.println("\nVita: " + character.getHealth() + "/" + character.getMaxHealth());
@@ -36,11 +32,8 @@ public class CombatSystem {
             
             // Attacco del personaggio
             int damage = character.attack();
-            if (damage > 0) {
-                monster.takeDamage(damage);
-            }
+            if (damage > 0) monster.takeDamage(damage);
             
-            // Verifica se il mostro è morto
             if (!monster.isAlive()) {
                 System.out.println("\nHai sconfitto " + monster.getName() + "!");
                 return character;
@@ -49,11 +42,8 @@ public class CombatSystem {
             // Turno del mostro
             System.out.println("\n--- Turno del mostro ---");
             int monsterDamage = monster.attack();
-            if (monsterDamage > 0) {
-                character.takeDamage(monsterDamage);
-            }
+            if (monsterDamage > 0) character.takeDamage(monsterDamage);
             
-            // Verifica se il personaggio è morto
             if (!character.isAlive()) {
                 System.out.println("\nSei stato sconfitto da " + monster.getName() + "!");
                 return createNewCharacter();
@@ -64,8 +54,39 @@ public class CombatSystem {
     }
     
     /**
+     * Verifica se un personaggio può combattere
+     */
+    public boolean canFight(Character character) {
+        return character != null && character.isAlive();
+    }
+    
+    /**
+     * Verifica se un mostro può combattere
+     */
+    public boolean canFight(AbstractMonster monster) {
+        return monster != null && monster.isAlive();
+    }
+    
+    /**
+     * Esegue un attacco del personaggio contro un mostro
+     */
+    public int executeAttack(Character character, AbstractMonster monster) {
+        int damage = character.attack();
+        if (damage > 0) monster.takeDamage(damage);
+        return damage;
+    }
+    
+    /**
+     * Esegue un attacco del mostro contro un personaggio
+     */
+    public int executeMonsterAttack(AbstractMonster monster, Character character) {
+        int damage = monster.attack();
+        if (damage > 0) character.takeDamage(damage);
+        return damage;
+    }
+    
+    /**
      * Crea un nuovo personaggio quando il giocatore muore
-     * @return Il nuovo personaggio
      */
     private Character createNewCharacter() {
         System.out.println("\nDevi creare un nuovo personaggio!");
@@ -89,9 +110,7 @@ public class CombatSystem {
         
         System.out.print("\nInserisci il nome del personaggio: ");
         String name = scanner.nextLine();
-        if (name.trim().isEmpty()) {
-            name = "Eroe";
-        }
+        if (name.trim().isEmpty()) name = "Eroe";
         
         Character newCharacter = factory.createCharacter(type, name);
         System.out.println("\nNuovo personaggio creato: " + newCharacter.getName());

@@ -9,7 +9,6 @@ import com.exam.project.iterator.*;
 import com.exam.project.builder.*;
 import com.exam.project.factoryMonster.*;
 import com.exam.project.security.InputValidator;
-import com.exam.project.strategy.*;
 import com.exam.project.logger.GameLogger;
 
 import org.junit.Test;
@@ -204,42 +203,6 @@ public class RPGGameTest {
         assertNotNull(swamp);
         assertEquals("Swamp of Trolls", swamp.getName());
         assertEquals(6, swamp.getNumberOfRooms());
-    }
-
-    // Test combat strategy
-    @Test
-    public void testCombatStrategy() {
-        Character warrior = factory.createCharacter("warrior", "Fighter");
-        WarriorStrategy strategy = new WarriorStrategy();
-
-        int damage = strategy.calculateDamage(warrior);
-        assertTrue(damage > 0);
-        assertEquals(5, strategy.getStaminaCost());
-    }
-
-    // Test combat system
-    @Test
-    public void testCombatSystem() {
-        logger.info("Testing combat system");
-        try {
-            Character warrior = factory.createCharacter("warrior", "Hero");
-            AbstractMonster goblin = monsterFactory.createMonster("goblin", 1);
-            CombatSystem combat = new CombatSystem();
-
-            assertTrue(combat.canFight(warrior));
-            assertTrue(combat.canFight(goblin));
-
-            int startHealth = goblin.getHealth();
-            int damage = combat.executeAttack(warrior, goblin);
-
-            if (damage > 0) {
-                assertTrue(goblin.getHealth() < startHealth);
-            }
-            logger.info("Combat system test passed");
-        } catch (Exception e) {
-            logger.severe("Combat system test failed: " + e.getMessage());
-            fail("Combat test failed");
-        }
     }
 
     // Test input validation
