@@ -1,178 +1,136 @@
 package com.exam.project.security;
 
-/**
- * Enhanced input validator with comprehensive error handling
+import com.exam.project.logger.GameLogger;
+import java.util.logging.Logger;/**
+ * Simple input validation
  */
 public class InputValidator {
 
-    private static final int MAX_NAME_LENGTH = 20;
-    private static final int MIN_NAME_LENGTH = 2;
+    private static final Logger logger = GameLogger.getLogger();
 
     /**
-     * Validates and cleans character names with error protection
-     * @param input The input name to validate
-     * @return Clean name or null if invalid
+     * Check character name
      */
     public static String validateCharacterName(String input) {
+        logger.info("Validating character name: " + input);
+
+        if (input == null || input.trim().isEmpty()) {
+            logger.warning("Character name validation failed: empty name");
+            System.out.println("Name cannot be empty!");
+            return null;
+        }
+
         try {
-            if (input == null) {
-                System.out.println("Name cannot be null!");
+            String name = input.trim();
+
+            if (name.length() < 2) {
+                logger.warning("Character name validation failed: too short");
+                System.out.println("Name too short!");
                 return null;
             }
 
-            String cleanName = input.trim();
-
-            if (cleanName.isEmpty()) {
-                System.out.println("Name cannot be empty!");
+            if (name.length() > 20) {
+                logger.warning("Character name validation failed: too long");
+                System.out.println("Name too long!");
                 return null;
             }
 
-            if (cleanName.length() < MIN_NAME_LENGTH) {
-                System.out.println("Name must be at least " + MIN_NAME_LENGTH + " characters!");
-                return null;
-            }
-
-            if (cleanName.length() > MAX_NAME_LENGTH) {
-                System.out.println("Name cannot exceed " + MAX_NAME_LENGTH + " characters!");
-                return null;
-            }
-
-            for (char c : cleanName.toCharArray()) {
-                if (!Character.isLetter(c) && c != ' ') {
-                    System.out.println("Name can only contain letters and spaces!");
-                    return null;
-                }
-            }
-
-            cleanName = cleanName.replaceAll(" +", " ");
-            return cleanName;
-
+            logger.info("Character name validated successfully: " + name);
+            return name;
         } catch (Exception e) {
-            System.out.println("Error validating name!");
+            logger.severe("Error validating character name: " + e.getMessage());
+            System.out.println("Name validation error!");
             return null;
         }
     }
 
     /**
-     * Validates menu choices with bounds checking
-     * @param input The input string to validate
-     * @param maxChoice The maximum valid choice
-     * @return Valid choice or null if invalid
+     * Check menu choice
      */
-    public static Integer validateMenuChoice(String input, int maxChoice) {
+    public static Integer validateMenuChoice(String input, int max) {
+        logger.info("Validating menu choice: " + input + " (max: " + max + ")");
+
+        if (input == null || input.trim().isEmpty()) {
+            logger.warning("Menu choice validation failed: empty input");
+            System.out.println("Please enter a number!");
+            return null;
+        }
+
         try {
-            if (input == null) {
-                System.out.println("Input cannot be null!");
+            int choice = Integer.parseInt(input.trim());
+
+            if (choice < 0 || choice > max) {
+                logger.warning("Menu choice validation failed: out of range (" + choice + ")");
+                System.out.println("Choose between 0 and " + max + "!");
                 return null;
             }
 
-            String cleanInput = input.trim();
-            if (cleanInput.isEmpty()) {
-                System.out.println("Please enter a number!");
-                return null;
-            }
-
-            int choice = Integer.parseInt(cleanInput);
-
-            if (choice < 0 || choice > maxChoice) {
-                System.out.println("Choose a number between 0 and " + maxChoice + "!");
-                return null;
-            }
-
+            logger.info("Menu choice validated: " + choice);
             return choice;
-
         } catch (NumberFormatException e) {
-            System.out.println("Please enter a valid number!");
+            logger.warning("Menu choice validation failed: not a number");
+            System.out.println("That's not a number!");
             return null;
         } catch (Exception e) {
-            System.out.println("Invalid input!");
+            logger.severe("Error validating menu choice: " + e.getMessage());
+            System.out.println("Input validation error!");
             return null;
         }
     }
 
     /**
-     * Validates yes/no input safely
-     * @param input The input to validate
-     * @return true for yes, false for no or invalid input
+     * Check yes/no
      */
     public static boolean validateYesNo(String input) {
+        logger.info("Validating yes/no input: " + input);
+
         try {
             if (input == null) {
+                logger.info("Yes/no validation: null input = false");
                 return false;
             }
 
             String clean = input.trim().toLowerCase();
-            return clean.equals("s") || clean.equals("si") || clean.equals("y") || clean.equals("yes");
+            boolean result = clean.equals("y") || clean.equals("yes") || clean.equals("s") || clean.equals("si");
 
+            logger.info("Yes/no validation result: " + result);
+            return result;
         } catch (Exception e) {
+            logger.warning("Error validating yes/no: " + e.getMessage());
             return false;
         }
     }
 
     /**
-     * Validates filename input safely
-     * @param input The filename to validate
-     * @return Clean filename or null if invalid
+     * Check filename
      */
     public static String validateFilename(String input) {
-        try {
-            if (input == null || input.trim().isEmpty()) {
-                System.out.println("Filename cannot be empty!");
-                return null;
-            }
+        logger.info("Validating filename: " + input);
 
-            String cleanName = input.trim();
-
-            if (cleanName.endsWith(".save")) {
-                cleanName = cleanName.substring(0, cleanName.length() - 5);
-            }
-
-            if (cleanName.length() > 30) {
-                System.out.println("Filename too long (max 30 characters)!");
-                return null;
-            }
-
-            for (char c : cleanName.toCharArray()) {
-                if (!Character.isLetterOrDigit(c) && c != '_') {
-                    System.out.println("Filename can only contain letters, numbers and underscore!");
-                    return null;
-                }
-            }
-
-            return cleanName + ".save";
-
-        } catch (Exception e) {
-            System.out.println("Error validating filename!");
+        if (input == null || input.trim().isEmpty()) {
+            logger.warning("Filename validation failed: empty filename");
+            System.out.println("Filename cannot be empty!");
             return null;
         }
-    }
 
-    /**
-     * Validates money amounts safely
-     * @param input The input to validate
-     * @return Valid amount or null if invalid
-     */
-    public static Integer validateMoney(String input) {
         try {
-            if (input == null || input.trim().isEmpty()) {
-                System.out.println("Amount cannot be empty!");
+            String name = input.trim();
+
+            if (name.length() > 30) {
+                logger.warning("Filename validation failed: too long");
+                System.out.println("Filename too long!");
                 return null;
             }
 
-            int amount = Integer.parseInt(input.trim());
+            // Remove bad characters
+            name = name.replaceAll("[^a-zA-Z0-9_]", "_");
+            String result = name + ".save";
 
-            if (amount < 0) {
-                System.out.println("Amount cannot be negative!");
-                return null;
-            }
-
-            return amount;
-
-        } catch (NumberFormatException e) {
-            System.out.println("Please enter a valid number!");
-            return null;
+            logger.info("Filename validated: " + result);
+            return result;
         } catch (Exception e) {
-            System.out.println("Invalid input!");
+            logger.severe("Error validating filename: " + e.getMessage());
+            System.out.println("Filename validation error!");
             return null;
         }
     }

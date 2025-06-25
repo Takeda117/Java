@@ -1,174 +1,115 @@
 package com.exam.project.factoryMonster;
 
-import com.exam.project.security.ExceptionHandler;
 import com.exam.project.logger.GameLogger;
 import java.util.Random;
 import java.util.logging.Logger;
 
 /**
- * Creates monsters with crash protection and input validation
+ * Factory for creating monsters
  */
 public class MonsterFactory {
 
     private static final Logger logger = GameLogger.getLogger();
-    private static final Random random = new Random();
+    private Random random = new Random();
 
     /**
-     * Creates a monster with full error handling and validation
-     * @param monsterType The type of monster to create
-     * @param difficulty The difficulty level (1-3)
-     * @return A new monster instance, or null if creation fails
+     * Create a monster
      */
-    public AbstractMonster createMonster(String monsterType, int difficulty) {
+    public AbstractMonster createMonster(String type, int difficulty) {
+        logger.info("Creating monster: type=" + type + ", difficulty=" + difficulty);
+
+        if (type == null) {
+            logger.warning("Monster creation failed: null type");
+            System.out.println("Monster type is null!");
+            return null;
+        }
+
         try {
-            // Input validation
-            if (monsterType == null || monsterType.trim().isEmpty()) {
-                System.out.println("Error: Monster type cannot be empty!");
-                logger.warning("createMonster called with null/empty type");
-                return null;
+            // Make sure difficulty is ok
+            int safeDifficulty = difficulty;
+            if (difficulty < 1) {
+                safeDifficulty = 1;
+                logger.info("Difficulty adjusted from " + difficulty + " to 1");
+            }
+            if (difficulty > 3) {
+                safeDifficulty = 3;
+                logger.info("Difficulty adjusted from " + difficulty + " to 3");
             }
 
-            // Sanitize and validate difficulty
-            int safeDifficulty = Math.max(1, Math.min(3, difficulty));
-            if (safeDifficulty != difficulty) {
-                logger.info("Difficulty adjusted from " + difficulty + " to " + safeDifficulty);
-            }
+            String cleanType = type.trim().toLowerCase();
 
-            // Clean input
-            String cleanType = monsterType.trim().toLowerCase();
-            AbstractMonster monster = null;
-
-            // Create monster with error handling for each type
             switch (cleanType) {
                 case "goblin":
-                    monster = createGoblinSafely(safeDifficulty);
-                    break;
+                    try {
+                        Goblin goblin = new Goblin(safeDifficulty);
+                        logger.info("Goblin created: " + goblin.getName());
+                        return goblin;
+                    } catch (Exception e) {
+                        logger.severe("Failed to create Goblin: " + e.getMessage());
+                        return null;
+                    }
 
                 case "troll":
-                    monster = createTrollSafely(safeDifficulty);
-                    break;
+                    try {
+                        Troll troll = new Troll(safeDifficulty);
+                        logger.info("Troll created: " + troll.getName());
+                        return troll;
+                    } catch (Exception e) {
+                        logger.severe("Failed to create Troll: " + e.getMessage());
+                        return null;
+                    }
 
                 default:
-                    System.out.println("Unknown monster type: " + monsterType);
-                    logger.warning("Unknown monster type requested: " + monsterType);
+                    logger.warning("Unknown monster type requested: " + type);
+                    System.out.println("Unknown monster: " + type);
                     return null;
             }
-
-            // Final validation
-            if (monster != null) {
-                logger.info("Monster created successfully: " + monster.getName());
-            } else {
-                logger.warning("Monster creation returned null for type: " + cleanType);
-            }
-
-            return monster;
-
         } catch (Exception e) {
-            ExceptionHandler.handleException(e, "Failed to create monster");
+            logger.severe("Unexpected error creating monster: " + e.getMessage());
+            System.out.println("Monster creation failed!");
             return null;
         }
     }
 
     /**
-     * Creates a Goblin with error protection
-     * @param difficulty The difficulty level
-     * @return A Goblin instance or null if creation fails
-     */
-    private Goblin createGoblinSafely(int difficulty) {
-        try {
-            Goblin goblin = new Goblin(difficulty);
-            logger.info("Goblin created: " + goblin.getName());
-            return goblin;
-        } catch (Exception e) {
-            logger.severe("Failed to create Goblin: " + e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Creates a Troll with error protection
-     * @param difficulty The difficulty level
-     * @return A Troll instance or null if creation fails
-     */
-    private Troll createTrollSafely(int difficulty) {
-        try {
-            Troll troll = new Troll(difficulty);
-            logger.info("Troll created: " + troll.getName());
-            return troll;
-        } catch (Exception e) {
-            logger.severe("Failed to create Troll: " + e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Creates a monster for Goblin Cave with validation
-     * @param difficulty The difficulty level
-     * @return A Goblin suitable for the cave
+     * Create goblin for goblin cave
      */
     public AbstractMonster createGoblinCaveMonster(int difficulty) {
+        logger.info("Creating Goblin Cave monster with difficulty " + difficulty);
         try {
-            return createMonster("Goblin", difficulty);
+            return createMonster("goblin", difficulty);
         } catch (Exception e) {
-            logger.warning("Failed to create Goblin Cave monster, using fallback");
-            return createMonster("Goblin", 1); // Safe fallback
+            logger.warning("Failed to create Goblin Cave monster: " + e.getMessage());
+            return createMonster("goblin", 1); // fallback
         }
     }
 
     /**
-     * Creates a monster for Swamp of Trolls with validation
-     * @param difficulty The difficulty level
-     * @return A Troll suitable for the swamp
+     * Create troll for swamp
      */
     public AbstractMonster createSwampMonster(int difficulty) {
+        logger.info("Creating Swamp monster with difficulty " + difficulty);
         try {
-            return createMonster("Troll", difficulty);
+            return createMonster("troll", difficulty);
         } catch (Exception e) {
-            logger.warning("Failed to create Swamp monster, using fallback");
-            return createMonster("Troll", 1); // Safe fallback
+            logger.warning("Failed to create Swamp monster: " + e.getMessage());
+            return createMonster("troll", 1); // fallback
         }
     }
 
     /**
-     * Gets recommended monster count with bounds checking
-     * @param dungeonName The name of the dungeon
-     * @param roomNumber The room number (unused but kept for interface)
-     * @return Safe monster count between 1-3
-     */
-    public static int getRecommendedMonsterCount(String dungeonName, int roomNumber) {
-        try {
-            if (dungeonName == null || dungeonName.trim().isEmpty()) {
-                return 1; // Safe default
-            }
-
-            String dungeonLower = dungeonName.toLowerCase();
-
-            if (dungeonLower.contains("goblin")) {
-                return 2; // 2 Goblins per room
-            } else if (dungeonLower.contains("troll") || dungeonLower.contains("swamp")) {
-                return 1; // 1 Troll per room
-            } else {
-                return 1; // Safe default
-            }
-
-        } catch (Exception e) {
-            logger.warning("Error calculating monster count: " + e.getMessage());
-            return 1; // Safe fallback
-        }
-    }
-
-    /**
-     * Shows available monster types with error protection
+     * Show available monsters
      */
     public void showAvailableTypes() {
+        logger.info("Displaying available monster types");
         try {
-            System.out.println("\n=== AVAILABLE MONSTER TYPES ===");
-            System.out.println("1. GOBLIN - Weak but numerous enemies");
-            System.out.println("2. TROLL - Strong and dangerous enemies");
-            System.out.println("Monster strength scales with difficulty level (1-3)");
+            System.out.println("\n=== MONSTERS ===");
+            System.out.println("1. GOBLIN - Weak enemies (Goblin Cave)");
+            System.out.println("2. TROLL - Strong enemies (Swamp of Trolls)");
+            System.out.println("\nDifficulty: 1 = Easy, 2 = Medium, 3 = Hard");
         } catch (Exception e) {
-            System.out.println("Error displaying monster types.");
-            logger.warning("Error in showAvailableTypes: " + e.getMessage());
+            logger.warning("Error displaying monster types: " + e.getMessage());
+            System.out.println("Error showing monster info!");
         }
     }
 }
