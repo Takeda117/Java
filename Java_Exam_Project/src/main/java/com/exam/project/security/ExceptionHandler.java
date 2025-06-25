@@ -3,6 +3,8 @@ package com.exam.project.security;
 import com.exam.project.logger.GameLogger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * ExceptionHandler - Gestisce le eccezioni del gioco in modo sicuro
@@ -33,7 +35,15 @@ public class ExceptionHandler {
      */
     public static void handleSaveLoadError(Exception e) {
         logger.log(Level.SEVERE, "Errore save/load: " + e.getMessage(), e);
-        System.out.println("Errore durante il salvataggio/caricamento. Riprova.");
+        
+        // Fornisci messaggi più specifici in base al tipo di eccezione
+        if (e instanceof FileNotFoundException) {
+            System.out.println("File non trovato. Controlla il nome del file.");
+        } else if (e instanceof IOException) {
+            System.out.println("Problema di accesso al file. Controlla i permessi.");
+        } else {
+            System.out.println("Errore durante il salvataggio/caricamento. Riprova.");
+        }
     }
 
     /**

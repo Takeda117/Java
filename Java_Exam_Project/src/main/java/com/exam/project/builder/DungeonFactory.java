@@ -18,6 +18,7 @@ public class DungeonFactory {
      */
     public static Dungeon createGoblinCave() {
         try {
+            logger.info("Creating Goblin Cave dungeon");
             return builder.reset()
                     .setName("Goblin Cave")
                     .setDescription("Una grotta oscura piena di goblin. Perfetta per principianti.")
@@ -40,6 +41,7 @@ public class DungeonFactory {
      */
     public static Dungeon createSwampOfTrolls() {
         try {
+            logger.info("Creating Swamp of Trolls dungeon");
             return builder.reset()
                     .setName("Swamp of Trolls")
                     .setDescription("Una palude pericolosa dove si nascondono potenti troll.")
@@ -62,6 +64,7 @@ public class DungeonFactory {
      */
     public static void showAvailableDungeons() {
         try {
+            logger.info("Showing available dungeons");
             System.out.println("\n=== DUNGEON DISPONIBILI ===\n");
 
             Dungeon goblinCave = createGoblinCave();
@@ -89,6 +92,7 @@ public class DungeonFactory {
      */
     public static Dungeon createDungeonByChoice(int choice) {
         try {
+            logger.info("Creating dungeon by choice: " + choice);
             switch (choice) {
                 case 1:
                     System.out.println("\nHai scelto la Goblin Cave!");
@@ -99,6 +103,7 @@ public class DungeonFactory {
                     return createSwampOfTrolls();
 
                 default:
+                    logger.warning("Invalid dungeon choice: " + choice + ", defaulting to Goblin Cave");
                     System.out.println("Scelta non valida! Usando Goblin Cave.");
                     return createGoblinCave();
             }
@@ -113,6 +118,7 @@ public class DungeonFactory {
      */
     public static void testBuilderPattern() {
         try {
+            logger.info("Testing Builder Pattern");
             System.out.println("\n=== TEST BUILDER PATTERN ===");
 
             // Test creazione custom

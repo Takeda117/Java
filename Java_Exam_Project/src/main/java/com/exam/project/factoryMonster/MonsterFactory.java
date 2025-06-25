@@ -23,19 +23,14 @@ public class MonsterFactory {
             System.out.println("Monster type is null!");
             return null;
         }
-
+        
+        // Assicurati che difficulty sia in un range valido
+        int safeDifficulty = Math.max(1, Math.min(3, difficulty));
+        if (safeDifficulty != difficulty) {
+            logger.warning("Invalid difficulty level adjusted: " + difficulty + " -> " + safeDifficulty);
+        }
+        
         try {
-            // Make sure difficulty is ok
-            int safeDifficulty = difficulty;
-            if (difficulty < 1) {
-                safeDifficulty = 1;
-                logger.info("Difficulty adjusted from " + difficulty + " to 1");
-            }
-            if (difficulty > 3) {
-                safeDifficulty = 3;
-                logger.info("Difficulty adjusted from " + difficulty + " to 3");
-            }
-
             String cleanType = type.trim().toLowerCase();
 
             switch (cleanType) {
@@ -65,8 +60,8 @@ public class MonsterFactory {
                     return null;
             }
         } catch (Exception e) {
-            logger.severe("Unexpected error creating monster: " + e.getMessage());
-            System.out.println("Monster creation failed!");
+            logger.severe("Error creating monster: " + e.getMessage());
+            System.out.println("Failed to create monster!");
             return null;
         }
     }

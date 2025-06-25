@@ -5,6 +5,7 @@ import com.exam.project.factory.CharacterFactory;
 import com.exam.project.factory.Warrior;
 import com.exam.project.factory.Mage;
 import com.exam.project.logger.GameLogger;
+import com.exam.project.security.InputValidator;
 
 import java.io.*;
 import java.util.Properties;
@@ -16,7 +17,9 @@ import java.util.logging.Logger;
  */
 public class CharacterManagement {
 
-    private static final String SAVE_DIR = "saves";
+    // Usa configurazioni esterne invece di valori hardcoded
+    private static final String SAVE_DIR = System.getProperty("game.save.dir", "saves");
+    private static final String FILE_EXT = System.getProperty("game.save.ext", ".save");
     private static final Logger logger = GameLogger.getLogger();
 
     /**
@@ -31,48 +34,63 @@ public class CharacterManagement {
             return false;
         }
 
+        // Sanitize filename
+        String safeFilename = InputValidator.sanitizeFilename(filename);
+        if (safeFilename.isEmpty()) {
+            logger.warning("Save failed: invalid filename after sanitization");
+            System.out.println("Invalid filename!");
+            return false;
+        }
+
         try {
             // Create saves directory if needed
             File dir = new File(SAVE_DIR);
             if (!dir.exists()) {
-                boolean created = dir.mkdir();
+                boolean created = dir.mkdirs(); // Usa mkdirs invece di mkdir per creare anche directory parent
                 logger.info("Save directory created: " + created);
+                if (!created) {
+                    logger.warning("Failed to create save directory");
+                    System.out.println("Failed to create save directory!");
+                    return false;
+                }
             }
 
             Properties props = new Properties();
 
-            // Save basic info
-            props.setProperty("name", character.getName());
+            // Save basic info with null checks
+            props.setProperty("name", character.getName() != null ? character.getName() : "Unknown");
             props.setProperty("type", character.getClass().getSimpleName());
-            props.setProperty("health", String.valueOf(character.getHealth()));
-            props.setProperty("stamina", String.valueOf(character.getStamina()));
-            props.setProperty("damage", String.valueOf(character.getBaseDamage()));
-            props.setProperty("money", String.valueOf(character.getMoney()));
+            props.setProperty("health", String.valueOf(Math.max(0, character.getHealth())));
+            props.setProperty("maxHealth", String.valueOf(Math.max(1, character.getMaxHealth())));
+            props.setProperty("stamina", String.valueOf(Math.max(0, character.getStamina())));
+            props.setProperty("maxStamina", String.valueOf(Math.max(1, character.getMaxStamina())));
+            props.setProperty("damage", String.valueOf(Math.max(0, character.getBaseDamage())));
+            props.setProperty("money", String.valueOf(Math.max(0, character.getMoney())));
+            props.setProperty("level", String.valueOf(Math.max(1, character.getLevel())));
 
             // Save mage mana if needed
             if (character instanceof Mage) {
                 Mage mage = (Mage) character;
-                props.setProperty("mana", String.valueOf(mage.getMana()));
+                props.setProperty("mana", String.valueOf(Math.max(0, mage.getMana())));
+                props.setProperty("maxMana", String.valueOf(Math.max(1, mage.getMaxMana())));
                 logger.info("Saved mage-specific data for: " + character.getName());
             }
 
             // Write to file
-            try {
-                FileOutputStream out = new FileOutputStream(SAVE_DIR + "/" + filename + ".save");
+            File saveFile = new File(SAVE_DIR + "/" + safeFilename);
+            try (FileOutputStream out = new FileOutputStream(saveFile)) {
                 props.store(out, "Character Save");
-                out.close();
                 logger.info("Character saved successfully: " + character.getName());
                 System.out.println("Character saved!");
                 return true;
-            } catch (IOException e) {
-                logger.severe("File write error: " + e.getMessage());
-                System.out.println("Save failed!");
-                return false;
             }
-
+        } catch (IOException e) {
+            logger.severe("File write error: " + e.getMessage());
+            ExceptionHandler.handleSaveLoadError(e);
+            return false;
         } catch (Exception e) {
             logger.severe("Unexpected error during save: " + e.getMessage());
-            System.out.println("Save failed!");
+            ExceptionHandler.handleException(e, "Save failed!");
             return false;
         }
     }
@@ -89,15 +107,29 @@ public class CharacterManagement {
             return null;
         }
 
-        Properties props = new Properties();
+        // Sanitize filename
+        String safeFilename = InputValidator.sanitizeFilename(filename.trim());
+        if (safeFilename.isEmpty()) {
+            logger.warning("Load failed: invalid filename");
+            System.out.println("Invalid filename!");
+            return null;
+        }
 
-        try {
-            FileInputStream in = new FileInputStream(SAVE_DIR + "/" + filename + ".save");
+        Properties props = new Properties();
+        File saveFile = new File(SAVE_DIR + "/" + safeFilename + FILE_EXT);
+        
+        // Verifica che il file esista prima di tentare di caricarlo
+        if (!saveFile.exists()) {
+            logger.warning("Save file not found: " + safeFilename);
+            System.out.println("Save file not found!");
+            return null;
+        }
+
+        try (FileInputStream in = new FileInputStream(saveFile)) {
             props.load(in);
-            in.close();
-            logger.info("File loaded successfully: " + filename);
+            logger.info("File loaded successfully: " + safeFilename);
         } catch (FileNotFoundException e) {
-            logger.warning("Save file not found: " + filename);
+            logger.warning("Save file not found: " + safeFilename);
             System.out.println("Save file not found!");
             return null;
         } catch (IOException e) {
@@ -119,17 +151,50 @@ public class CharacterManagement {
             // Create character
             CharacterFactory factory = new CharacterFactory();
             String charType = type.equals("Warrior") ? "warrior" : "mage";
+            
+            // Creiamo prima il personaggio base
             Character character = factory.createCharacter(charType, name);
-
-            if (character != null) {
-                logger.info("Character recreated successfully: " + name);
-                System.out.println("Character loaded: " + name);
-            } else {
+            
+            if (character == null) {
                 logger.warning("Character factory returned null");
+                System.out.println("Failed to create character!");
+                return null;
+            }
+            
+            // Carica i valori base
+            try {
+                // Leggiamo i valori dal file
+                int health = Integer.parseInt(props.getProperty("health", "0"));
+                int maxHealth = Integer.parseInt(props.getProperty("maxHealth", "0"));
+                int stamina = Integer.parseInt(props.getProperty("stamina", "0"));
+                int maxStamina = Integer.parseInt(props.getProperty("maxStamina", "0"));
+                int damage = Integer.parseInt(props.getProperty("damage", "0"));
+                int money = Integer.parseInt(props.getProperty("money", "0"));
+                int level = Integer.parseInt(props.getProperty("level", "1"));
+                
+                // Invece di usare setter, ricrea il personaggio con i valori caricati
+                // Questo approccio richiede che il factory supporti la creazione con valori personalizzati
+                character = factory.createCustomCharacter(charType, name, health, maxHealth, 
+                                                         stamina, maxStamina, damage, money, level);
+                
+                // Se il personaggio è un mago, carica anche il mana
+                if (character instanceof Mage && props.containsKey("mana") && props.containsKey("maxMana")) {
+                    int mana = Integer.parseInt(props.getProperty("mana", "0"));
+                    int maxMana = Integer.parseInt(props.getProperty("maxMana", "0"));
+                    
+                    // Ricrea il mago con i valori di mana
+                    character = factory.createCustomMage(name, health, maxHealth, stamina, maxStamina, 
+                                                       damage, money, level, mana, maxMana);
+                }
+            } catch (NumberFormatException e) {
+                logger.warning("Error parsing numeric values: " + e.getMessage());
+                // Continua con i valori predefiniti
             }
 
+            logger.info("Character loaded successfully: " + name);
+            System.out.println("Character loaded: " + name);
             return character;
-
+            
         } catch (Exception e) {
             logger.severe("Error recreating character: " + e.getMessage());
             System.out.println("Load failed!");
@@ -141,15 +206,16 @@ public class CharacterManagement {
      * Check if save exists
      */
     public static boolean saveExists(String filename) {
-        try {
-            if (filename == null) {
-                logger.warning("saveExists called with null filename");
-                return false;
-            }
+        if (filename == null || filename.trim().isEmpty()) {
+            logger.warning("saveExists called with invalid filename");
+            return false;
+        }
 
-            File file = new File(SAVE_DIR + "/" + filename + ".save");
+        try {
+            String safeFilename = InputValidator.sanitizeFilename(filename);
+            File file = new File(SAVE_DIR + "/" + safeFilename + FILE_EXT);
             boolean exists = file.exists();
-            logger.info("Save file check for " + filename + ": " + exists);
+            logger.info("Save file check for " + safeFilename + ": " + exists);
             return exists;
         } catch (Exception e) {
             logger.warning("Error checking save file existence: " + e.getMessage());
@@ -170,29 +236,19 @@ public class CharacterManagement {
                 return new String[0];
             }
 
-            File[] files = dir.listFiles();
+            File[] files = dir.listFiles((d, name) -> name.endsWith(FILE_EXT));
             if (files == null) {
                 logger.warning("Could not list files in save directory");
                 return new String[0];
             }
 
             String[] names = new String[files.length];
-            int count = 0;
             for (int i = 0; i < files.length; i++) {
-                String name = files[i].getName();
-                if (name.endsWith(".save")) {
-                    names[count] = name.replace(".save", "");
-                    count++;
-                }
+                names[i] = files[i].getName().replace(FILE_EXT, "");
             }
 
-            // Resize array to actual count
-            String[] result = new String[count];
-            System.arraycopy(names, 0, result, 0, count);
-
-            logger.info("Found " + count + " save files");
-            return result;
-
+            logger.info("Found " + names.length + " save files");
+            return names;
         } catch (Exception e) {
             logger.severe("Error listing save files: " + e.getMessage());
             return new String[0];
@@ -205,25 +261,27 @@ public class CharacterManagement {
     public static boolean deleteSave(String filename) {
         logger.info("Attempting to delete save: " + filename);
 
-        try {
-            if (filename == null) {
-                logger.warning("Delete called with null filename");
-                return false;
-            }
+        if (filename == null || filename.trim().isEmpty()) {
+            logger.warning("Delete called with invalid filename");
+            return false;
+        }
 
-            File file = new File(SAVE_DIR + "/" + filename + ".save");
+        try {
+            String safeFilename = InputValidator.sanitizeFilename(filename);
+            File file = new File(SAVE_DIR + "/" + safeFilename + FILE_EXT);
+            
             if (file.exists()) {
                 boolean deleted = file.delete();
                 if (deleted) {
-                    logger.info("Save file deleted successfully: " + filename);
+                    logger.info("Save file deleted successfully: " + safeFilename);
                     System.out.println("Save deleted!");
                 } else {
-                    logger.warning("Failed to delete save file: " + filename);
+                    logger.warning("Failed to delete save file: " + safeFilename);
                     System.out.println("Delete failed!");
                 }
                 return deleted;
             } else {
-                logger.info("Save file not found for deletion: " + filename);
+                logger.info("Save file not found for deletion: " + safeFilename);
                 System.out.println("Save not found!");
                 return false;
             }
@@ -231,6 +289,19 @@ public class CharacterManagement {
             logger.severe("Error deleting save file: " + e.getMessage());
             System.out.println("Delete failed!");
             return false;
+        }
+    }
+
+    /**
+     * Helper method to set a field value using reflection
+     */
+    private static void setFieldValue(Object object, Class<?> clazz, String fieldName, Object value) {
+        try {
+            java.lang.reflect.Field field = clazz.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(object, value);
+        } catch (Exception e) {
+            logger.warning("Failed to set field " + fieldName + ": " + e.getMessage());
         }
     }
 }

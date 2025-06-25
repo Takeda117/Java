@@ -1,5 +1,6 @@
 package com.exam.project.builder;
 
+import com.exam.project.combat.CombatSystem;
 import com.exam.project.factory.Character;
 import com.exam.project.factoryMonster.AbstractMonster;
 import com.exam.project.factoryMonster.MonsterFactory;
@@ -15,6 +16,7 @@ import java.util.logging.Logger;
 
 /**
  * Dungeon exploration system
+ * Implementa il Builder Pattern per costruire l'esperienza di esplorazione
  */
 public class DungeonExplorer {
 
@@ -23,6 +25,13 @@ public class DungeonExplorer {
     private Random random;
     private MonsterFactory monsterFactory;
     private CombatSystem combatSystem;
+    
+    // Builder per l'esplorazione
+    private Character character;
+    private Dungeon dungeon;
+    private boolean enableRest = true;
+    private boolean enableFlee = true;
+    private int difficultyModifier = 0;
 
     public DungeonExplorer() {
         try {
@@ -35,6 +44,60 @@ public class DungeonExplorer {
             logger.severe("Failed to initialize DungeonExplorer: " + e.getMessage());
             throw new RuntimeException("Cannot create DungeonExplorer", e);
         }
+    }
+    
+    /**
+     * Builder method: imposta il personaggio
+     */
+    public DungeonExplorer withCharacter(Character character) {
+        this.character = character;
+        return this;
+    }
+    
+    /**
+     * Builder method: imposta il dungeon
+     */
+    public DungeonExplorer withDungeon(Dungeon dungeon) {
+        this.dungeon = dungeon;
+        return this;
+    }
+    
+    /**
+     * Builder method: abilita/disabilita il riposo tra le stanze
+     */
+    public DungeonExplorer enableRest(boolean enable) {
+        this.enableRest = enable;
+        return this;
+    }
+    
+    /**
+     * Builder method: abilita/disabilita la possibilità di fuggire
+     */
+    public DungeonExplorer enableFlee(boolean enable) {
+        this.enableFlee = enable;
+        return this;
+    }
+    
+    /**
+     * Builder method: imposta un modificatore di difficoltà
+     */
+    public DungeonExplorer withDifficultyModifier(int modifier) {
+        this.difficultyModifier = modifier;
+        return this;
+    }
+    
+    /**
+     * Builder method: costruisce e avvia l'esplorazione
+     */
+    public boolean build() {
+        logger.info("Building dungeon exploration experience");
+        
+        if (character == null || dungeon == null) {
+            logger.warning("Cannot build exploration: missing character or dungeon");
+            return false;
+        }
+        
+        return exploreDungeon(character, dungeon);
     }
 
     /**
@@ -104,7 +167,7 @@ public class DungeonExplorer {
                     }
 
                     // Rest between rooms
-                    if (room < dungeon.getNumberOfRooms()) {
+                    if (enableRest && room < dungeon.getNumberOfRooms()) {
                         offerRest(character);
                     }
 
@@ -147,52 +210,26 @@ public class DungeonExplorer {
     private List<AbstractMonster> createMonsters(Dungeon dungeon) {
         logger.info("Creating monsters for " + dungeon.getName());
 
-        List<AbstractMonster> monsters = new ArrayList<>();
-
         try {
-            String dungeonName = dungeon.getName().toLowerCase();
-            String monsterType;
-            int count = dungeon.getMonstersPerRoom();
-
-            // Decide monster type based on dungeon
-            if (dungeonName.contains("goblin")) {
-                monsterType = "goblin";
-                logger.info("Spawning goblins for Goblin Cave");
-            } else if (dungeonName.contains("troll") || dungeonName.contains("swamp")) {
-                monsterType = "troll";
-                logger.info("Spawning trolls for Swamp of Trolls");
-            } else {
-                monsterType = "goblin"; // default
-                logger.warning("Unknown dungeon type, defaulting to goblins");
+            if (dungeon == null) {
+                logger.warning("Null dungeon passed to createMonsters");
+                return new ArrayList<>();
             }
-
-            // Sometimes add one more monster
-            if (random.nextInt(100) < 30) {
-                count++;
-                logger.info("Extra monster spawned due to random chance");
+            
+            // Usa il metodo integrato nel dungeon per creare i mostri
+            List<AbstractMonster> monsters = dungeon.createMonstersForRoom();
+            
+            // Verifica che la lista non sia null
+            if (monsters == null) {
+                logger.warning("Dungeon returned null monster list");
+                return new ArrayList<>();
             }
-
-            // Create monsters
-            for (int i = 0; i < count; i++) {
-                try {
-                    AbstractMonster monster = monsterFactory.createMonster(monsterType, dungeon.getBaseDifficulty());
-                    if (monster != null) {
-                        monsters.add(monster);
-                        logger.info("Created " + monsterType + ": " + monster.getName());
-                    } else {
-                        logger.warning("Monster factory returned null for " + monsterType);
-                    }
-                } catch (Exception e) {
-                    logger.warning("Failed to create individual monster: " + e.getMessage());
-                }
-            }
-
+            
+            return monsters;
         } catch (Exception e) {
             logger.severe("Error creating monsters: " + e.getMessage());
+            return new ArrayList<>();
         }
-
-        logger.info("Created " + monsters.size() + " monsters for room");
-        return monsters;
     }
 
     /**
@@ -211,7 +248,9 @@ public class DungeonExplorer {
 
                 // Player turn
                 System.out.println("\n1. Attack");
-                System.out.println("2. Try to flee");
+                if (enableFlee) {
+                    System.out.println("2. Try to flee");
+                }
                 System.out.print("What do you do? ");
 
                 String input;
@@ -223,7 +262,7 @@ public class DungeonExplorer {
                     input = "1";
                 }
 
-                Integer choice = InputValidator.validateMenuChoice(input, 2);
+                Integer choice = InputValidator.validateMenuChoice(input, enableFlee ? 2 : 1);
 
                 if (choice == null) {
                     logger.info("Player entered invalid choice");
@@ -256,7 +295,7 @@ public class DungeonExplorer {
                         System.out.println("Attack failed due to error!");
                     }
 
-                } else if (choice == 2) {
+                } else if (choice == 2 && enableFlee) {
                     // Try to flee
                     logger.info("Player attempting to flee");
 

@@ -148,8 +148,20 @@ public class StaminaRecoverySystem {
      */
     private void notifyStaminaChanged(Character character, int oldStamina, int newStamina) {
         try {
+            if (character == null) {
+                logger.warning("Null character in notifyStaminaChanged");
+                return;
+            }
+            
+            if (observers == null || observers.isEmpty()) {
+                logger.fine("No observers to notify");
+                return;
+            }
+            
             for (StaminaObserver observer : observers) {
-                observer.onStaminaChanged(character, oldStamina, newStamina);
+                if (observer != null) {
+                    observer.onStaminaChanged(character, oldStamina, newStamina);
+                }
             }
         } catch (Exception e) {
             logger.warning("Error notifying observers: " + e.getMessage());

@@ -5,47 +5,45 @@ package com.exam.project.composite;
  *
  * This interface defines the common operations for both
  * individual menu items and composite menus
- *
- * The Composite pattern allows us to treat individual items
- * and collections of items uniformly
  */
 public interface MenuComponent {
 
     /**
      * Execute the action associated with this menu component
-     * For menu items, this performs an action
-     * For menus, this displays the menu and handles navigation
      */
     void execute();
 
     /**
      * Display the menu component
-     * For menu items, this shows the item name
-     * For menus, this shows the menu title
      */
     void display();
-
+    
     /**
-     * Add a child component (only meaningful for composite menus)
-     * Default implementation throws exception for leaf nodes
+     * Add a component to this menu component
+     * Default implementation for leaf nodes
      */
     default void add(MenuComponent component) {
-        throw new UnsupportedOperationException("Cannot add to a leaf component");
+        throw new UnsupportedOperationException("Cannot add to a leaf");
     }
-
+    
     /**
-     * Remove a child component (only meaningful for composite menus)
-     * Default implementation throws exception for leaf nodes
+     * Remove a component from this menu component
+     * Default implementation for leaf nodes
      */
     default void remove(MenuComponent component) {
-        throw new UnsupportedOperationException("Cannot remove from a leaf component");
+        throw new UnsupportedOperationException("Cannot remove from a leaf");
     }
-
+    
     /**
-     * Get a child component (only meaningful for composite menus)
-     * Default implementation throws exception for leaf nodes
+     * Get a child component at the specified index
+     * Default implementation for leaf nodes
      */
     default MenuComponent getChild(int index) {
-        throw new UnsupportedOperationException("Cannot get child from a leaf component");
+        throw new UnsupportedOperationException("Cannot get child from a leaf");
     }
+    
+    /**
+     * Get the name of this menu component
+     */
+    String getName();
 }

@@ -3,6 +3,8 @@ package com.exam.project.observer;
 import com.exam.project.factory.Character;
 import com.exam.project.logger.GameLogger;
 import java.util.logging.Logger;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * GameUIObserver - Concrete implementation of StaminaObserver
@@ -17,39 +19,37 @@ import java.util.logging.Logger;
 public class GameUIObserver implements StaminaObserver {
 
     private static final Logger logger = GameLogger.getLogger();
-
-    // Flag to control if we show stamina recovery messages to player
-    private boolean showRecoveryMessages;
+    private boolean showRecoveryMessages = true;
+    private List<Character> observedCharacters = new ArrayList<>();
 
     /**
      * Constructor
-     * @param showRecoveryMessages Whether to display recovery messages to player
      */
-    public GameUIObserver(boolean showRecoveryMessages) {
-        this.showRecoveryMessages = showRecoveryMessages;
+    public GameUIObserver() {
         logger.info("GameUIObserver created");
     }
 
     /**
-     * Called when character stamina changes
-     * Shows appropriate message to the player
+     * Called when a character's stamina changes
      */
     @Override
     public void onStaminaChanged(Character character, int oldStamina, int newStamina) {
         try {
-            // Log the change for debugging
-            logger.fine(String.format("Stamina changed for %s: %d -> %d",
-                    character.getName(), oldStamina, newStamina));
-
-            // Show different messages based on what happened
-            if (newStamina > oldStamina) {
-                // Stamina increased (recovery or rest)
-                onStaminaIncreased(character, oldStamina, newStamina);
-            } else if (newStamina < oldStamina) {
-                // Stamina decreased (used for actions)
-                onStaminaDecreased(character, oldStamina, newStamina);
+            if (!observedCharacters.contains(character)) {
+                observedCharacters.add(character);
             }
+            
+            int diff = newStamina - oldStamina;
+            String change = diff > 0 ? "increased" : "decreased";
+            
+            logger.info(String.format("%s's stamina %s: %d -> %d",
+                    character.getName(), change, oldStamina, newStamina));
 
+            // In a real game, this would update UI elements
+            if (Math.abs(diff) > 5) {
+                System.out.println("[UI] " + character.getName() + "'s stamina " + 
+                        change + " by " + Math.abs(diff));
+            }
         } catch (Exception e) {
             logger.warning("Error in onStaminaChanged: " + e.getMessage());
         }
@@ -61,6 +61,10 @@ public class GameUIObserver implements StaminaObserver {
     @Override
     public void onStaminaRecovered(Character character, int recoveredAmount) {
         try {
+            if (!observedCharacters.contains(character)) {
+                observedCharacters.add(character);
+            }
+            
             if (showRecoveryMessages && recoveredAmount > 0) {
                 // Only show recovery messages if enabled and something was recovered
                 System.out.println("💚 " + character.getName() +
@@ -77,106 +81,36 @@ public class GameUIObserver implements StaminaObserver {
     }
 
     /**
-     * Handles stamina increase events
-     */
-    private void onStaminaIncreased(Character character, int oldStamina, int newStamina) {
-        try {
-            int increase = newStamina - oldStamina;
-
-            // Show message for significant stamina gains (like from rest)
-            if (increase >= 10) {
-                System.out.println("✨ " + character.getName() +
-                        " feels refreshed! (+" + increase + " stamina)");
-            }
-
-        } catch (Exception e) {
-            logger.warning("Error handling stamina increase: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Handles stamina decrease events
-     */
-    private void onStaminaDecreased(Character character, int oldStamina, int newStamina) {
-        try {
-            int decrease = oldStamina - newStamina;
-
-            // Warn player if stamina is getting low
-            if (newStamina <= 10 && decrease > 0) {
-                System.out.println("⚠️  " + character.getName() +
-                        " is getting tired! (Stamina: " + newStamina + ")");
-            }
-
-            // Warn if completely exhausted
-            if (newStamina == 0) {
-                System.out.println("😴 " + character.getName() +
-                        " is completely exhausted and needs rest!");
-            }
-
-        } catch (Exception e) {
-            logger.warning("Error handling stamina decrease: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Shows current character status (useful for debugging)
-     * @param character The character to show status for
-     */
-    public void showCharacterStatus(Character character) {
-        try {
-            if (character != null) {
-                int stamina = character.getStamina();
-                int maxStamina = character.getMaxStamina();
-                double percentage = (double) stamina / maxStamina * 100;
-
-                String staminaBar = createStaminaBar(stamina, maxStamina);
-
-                System.out.println(String.format("\n%s Status:", character.getName()));
-                System.out.println(String.format("Stamina: %s (%.1f%%)",
-                        staminaBar, percentage));
-                System.out.println(String.format("Health: %d/%d",
-                        character.getHealth(), character.getMaxHealth()));
-            }
-        } catch (Exception e) {
-            logger.warning("Error showing character status: " + e.getMessage());
-            System.out.println("Unable to show character status");
-        }
-    }
-
-    /**
-     * Creates a simple text-based stamina bar
-     * @param current Current stamina
-     * @param max Maximum stamina
-     * @return String representation of stamina bar
-     */
-    private String createStaminaBar(int current, int max) {
-        try {
-            int barLength = 10;
-            int filled = (int) ((double) current / max * barLength);
-
-            StringBuilder bar = new StringBuilder("[");
-            for (int i = 0; i < barLength; i++) {
-                if (i < filled) {
-                    bar.append("█");
-                } else {
-                    bar.append("░");
-                }
-            }
-            bar.append("] ").append(current).append("/").append(max);
-
-            return bar.toString();
-        } catch (Exception e) {
-            // Fallback to simple format if bar creation fails
-            return current + "/" + max;
-        }
-    }
-
-    /**
-     * Enables or disables recovery message display
-     * @param show Whether to show recovery messages
+     * Enable or disable recovery messages
      */
     public void setShowRecoveryMessages(boolean show) {
         this.showRecoveryMessages = show;
         logger.info("Recovery messages " + (show ? "enabled" : "disabled"));
+    }
+    
+    /**
+     * Notifica tutti i personaggi osservati di un evento
+     * Implementazione del pattern Observer
+     */
+    public void notifyObservers(String message) {
+        logger.info("Notifying all observers: " + message);
+        
+        for (Character character : observedCharacters) {
+            try {
+                System.out.println("[UI Notification] " + character.getName() + ": " + message);
+            } catch (Exception e) {
+                logger.warning("Error notifying character: " + e.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Notifica un personaggio specifico
+     */
+    public void notifyObserver(Character character, String message) {
+        if (character != null && observedCharacters.contains(character)) {
+            logger.info("Notifying observer " + character.getName() + ": " + message);
+            System.out.println("[UI Notification] " + character.getName() + ": " + message);
+        }
     }
 }

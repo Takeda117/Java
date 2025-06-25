@@ -69,6 +69,7 @@ public abstract class AbstractCharacter implements Character {
             int oldHealth = this.health;
             this.health = Math.max(0, this.health - damage);
 
+            // Usa getName() con controllo null
             String safeName = (name != null) ? name : "Character";
             System.out.printf("%s takes %d damage! Health: %d/%d%n",
                     safeName, damage, Math.max(0, health), Math.max(1, maxHealth));
@@ -81,6 +82,10 @@ public abstract class AbstractCharacter implements Character {
         } catch (Exception e) {
             logger.severe("Error in takeDamage: " + e.getMessage());
             System.out.println("Damage calculation error occurred.");
+            // Assicurati che il personaggio non sia invincibile a causa di un errore
+            if (this.health > 0) {
+                this.health = Math.max(0, this.health - 1);
+            }
         }
     }
 

@@ -1,6 +1,8 @@
 package com.exam.project.observer;
 
 import com.exam.project.factory.Character;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Observer Pattern - Interface for stamina recovery system

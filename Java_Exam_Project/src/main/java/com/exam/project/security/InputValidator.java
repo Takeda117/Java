@@ -122,10 +122,15 @@ public class InputValidator {
                 return null;
             }
 
-            // Remove bad characters
-            name = name.replaceAll("[^a-zA-Z0-9_]", "_");
-            String result = name + ".save";
+            // Sanitize filename
+            name = sanitizeFilename(name);
+            if (name.isEmpty()) {
+                logger.warning("Filename validation failed: invalid characters");
+                System.out.println("Invalid filename!");
+                return null;
+            }
 
+            String result = name + ".save";
             logger.info("Filename validated: " + result);
             return result;
         } catch (Exception e) {
@@ -133,5 +138,46 @@ public class InputValidator {
             System.out.println("Filename validation error!");
             return null;
         }
+    }
+
+
+    /**
+     * Sanitize filename to prevent path traversal attacks
+     */
+    public static String sanitizeFilename(String input) {
+        logger.info("Sanitizing filename: " + input);
+
+        if (input == null || input.trim().isEmpty()) {
+            logger.warning("Filename validation failed: empty name");
+            return "";
+        }
+
+        try {
+            String name = input.trim();
+
+            if (name.length() > 30) {
+                logger.warning("Filename validation failed: too long");
+                System.out.println("Filename too long!");
+                return "";
+            }
+
+            // Rimuovi caratteri pericolosi e path traversal
+            name = name.replaceAll("[^a-zA-Z0-9_\\-]", "_");
+            
+            // Previeni path traversal
+            if (name.contains("..") || name.startsWith(".") || name.startsWith("/") || name.startsWith("\\")) {
+                logger.warning("Potential path traversal attempt: " + input);
+                return "";
+            }
+
+            logger.info("Filename sanitized: " + name);
+            return name;
+        } catch (Exception e) {
+            logger.severe("Error sanitizing filename: " + e.getMessage());
+            return "";
+        }
+    }
+
+    public static String sanitizeInput(String s) {
     }
 }
