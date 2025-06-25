@@ -2,9 +2,7 @@ com\exam\project\App.class
 com\exam\project\factory\Character.class
 com\exam\project\factory\Mage.class
 com\exam\project\logger\GameLogger.class
-com\exam\project\composite\GameAction.class
 com\exam\project\factory\CharacterFactory.class
 com\exam\project\factory\Warrior.class
-com\exam\project\composite\GameCommand.class
 com\exam\project\composite\GameMenu.class
 com\exam\project\factory\AbstractCharacter.class

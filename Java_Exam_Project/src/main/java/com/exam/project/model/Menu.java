@@ -229,56 +229,31 @@ public class Menu {
     }
 
     /**
-     * Explore dungeon menu
+     * Explore dungeon menu - ONLY 2 dungeons
      */
     private static void exploreDungeonMenu() {
         System.out.println("\n=== DUNGEON SELECTION ===");
 
-        // Show available dungeons
         dungeonFactory.showAvailableDungeons();
 
         System.out.println("\nSelect dungeon:");
         System.out.println("1. Goblin Cave");
-        System.out.println("2. Orc Stronghold");
-        System.out.println("3. Ancient Crypt");
-        System.out.println("4. Custom Dungeon");
+        System.out.println("2. Swamp of Trolls");
         System.out.println("0. Cancel");
 
         System.out.print("\nYour choice: ");
         String input = scanner.nextLine();
-        Integer choice = InputValidator.validateMenuChoice(input, 4);
+        Integer choice = InputValidator.validateMenuChoice(input, 2);
 
         if (choice == null || choice == 0) {
             return;
         }
 
-        Dungeon selectedDungeon = null;
-
-        switch (choice) {
-            case 1:
-                selectedDungeon = dungeonFactory.createGoblinCave();
-                break;
-            case 2:
-                selectedDungeon = dungeonFactory.createOrcStronghold();
-                break;
-            case 3:
-                selectedDungeon = dungeonFactory.createAncientCrypt();
-                break;
-            case 4:
-                // Custom dungeon
-                System.out.print("Enter dungeon name: ");
-                String dungeonName = scanner.nextLine();
-                System.out.print("Enter difficulty (1-10): ");
-                String diffInput = scanner.nextLine();
-                Integer difficulty = InputValidator.validateMenuChoice(diffInput, 10);
-                if (difficulty != null && difficulty > 0) {
-                    selectedDungeon = dungeonFactory.createCustomDungeon(dungeonName, difficulty);
-                }
-                break;
-        }
+        Dungeon selectedDungeon = dungeonFactory.createDungeonByChoice(choice);
 
         if (selectedDungeon != null) {
-            // Start dungeon exploration
+            System.out.println("\n" + selectedDungeon.getFullDescription());
+
             boolean completed = dungeonExplorer.exploreDungeon(currentCharacter, selectedDungeon);
 
             if (completed) {

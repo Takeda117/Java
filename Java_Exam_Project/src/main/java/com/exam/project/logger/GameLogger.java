@@ -5,26 +5,48 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+/**
+ * GameLogger - Singleton pattern with essential crash protection
+ */
 public class GameLogger {
-//Using singleton + logger
 
-    private static final Logger logger = Logger.getLogger("It's me, a logger!");
+    private static final Logger logger = createLogger();
 
-    static {
-        logger.setUseParentHandlers(false); // disattiva il logger di default
-
-        ConsoleHandler handler = new ConsoleHandler();
-        handler.setLevel(Level.INFO);
-        handler.setFormatter(new SimpleFormatter());
-
-        logger.addHandler(handler);
-        logger.setLevel(Level.INFO);
-    }
-
+    /**
+     * Private constructor - Singleton pattern
+     */
     private GameLogger() {
-        // private constructor to prevent instantiation
     }
 
+    /**
+     * Creates and configures the logger with error handling
+     * @return Configured logger instance
+     */
+    private static Logger createLogger() {
+        Logger gameLogger = Logger.getLogger("RPG_Game");
+
+        try {
+            gameLogger.setUseParentHandlers(false);
+
+            ConsoleHandler handler = new ConsoleHandler();
+            handler.setLevel(Level.INFO);
+            handler.setFormatter(new SimpleFormatter());
+
+            gameLogger.addHandler(handler);
+            gameLogger.setLevel(Level.INFO);
+
+        } catch (Exception e) {
+            // Fallback: if handler setup fails, still return working logger
+            System.err.println("Warning: Logger setup failed, using default configuration");
+        }
+
+        return gameLogger;
+    }
+
+    /**
+     * Gets the singleton logger instance
+     * @return Logger instance
+     */
     public static Logger getLogger() {
         return logger;
     }

@@ -1,102 +1,107 @@
 package com.exam.project.builder;
 
-import java.util.Arrays;
+import com.exam.project.logger.GameLogger;
+import java.util.logging.Logger;
 
 /**
- * DungeonFactory - Creates predefined dungeon configurations
- *
- * This factory uses the DungeonBuilder to create various
- * pre-configured dungeons that players can explore
+ * DungeonFactory - Creates exactly TWO dungeons using Builder Pattern
  */
 public class DungeonFactory {
 
-    /**
-     * Create the Goblin Cave - a beginner dungeon
-     *
-     * @return A configured Goblin Cave dungeon
-     */
-    public Dungeon createGoblinCave() {
-        return new Dungeon.DungeonBuilder("Goblin Cave", 1)
-                .withRooms(3)
-                .withMonstersPerRoom(1, 3)
-                .withGoldReward(150)
-                .withExperienceReward(100)
-                .withMonsterTypes(Arrays.asList("Goblin", "Wolf"))
-                .build();
-    }
+    private static final Logger logger = GameLogger.getLogger();
 
     /**
-     * Create the Orc Stronghold - an intermediate dungeon
-     *
-     * @return A configured Orc Stronghold dungeon
+     * Creates Goblin Cave using Builder Pattern
      */
-    public Dungeon createOrcStronghold() {
-        return new Dungeon.DungeonBuilder("Orc Stronghold", 3)
-                .withRooms(5)
-                .withMonstersPerRoom(2, 4)
-                .withGoldReward(300)
-                .withExperienceReward(200)
-                .withMonsterTypes(Arrays.asList("Orc", "Goblin", "Wolf"))
-                .build();
-    }
+    public static Dungeon createGoblinCave() {
+        try {
+            return new Dungeon.DungeonBuilder("Goblin Cave")
+                    .withDescription("A dark cave filled with goblins. Perfect for beginners.")
+                    .withRooms(4)
+                    .withGoldReward(150)
+                    .withExperienceReward(100)
+                    .addMonsterType("Goblin")
+                    .build();
 
-    /**
-     * Create the Ancient Crypt - a harder dungeon
-     *
-     * @return A configured Ancient Crypt dungeon
-     */
-    public Dungeon createAncientCrypt() {
-        return new Dungeon.DungeonBuilder("Ancient Crypt", 5)
-                .withRooms(7)
-                .withMonstersPerRoom(2, 5)
-                .withGoldReward(500)
-                .withExperienceReward(350)
-                .withMonsterTypes(Arrays.asList("Skeleton", "Orc", "Wolf"))
-                .build();
-    }
-
-    /**
-     * Create a custom dungeon with specified parameters
-     * This shows the flexibility of the Builder pattern
-     *
-     * @param name The dungeon name
-     * @param difficulty The difficulty level (1-10)
-     * @return A custom configured dungeon
-     */
-    public Dungeon createCustomDungeon(String name, int difficulty) {
-        // Calculate parameters based on difficulty
-        int rooms = Math.min(difficulty + 2, 10);
-        int minMonsters = Math.max(1, difficulty / 2);
-        int maxMonsters = Math.min(difficulty + 1, 8);
-        int gold = difficulty * 100;
-        int exp = difficulty * 75;
-
-        Dungeon.DungeonBuilder builder = new Dungeon.DungeonBuilder(name, difficulty)
-                .withRooms(rooms)
-                .withMonstersPerRoom(minMonsters, maxMonsters)
-                .withGoldReward(gold)
-                .withExperienceReward(exp);
-
-        // Add monster types based on difficulty
-        if (difficulty <= 2) {
-            builder.withMonsterTypes(Arrays.asList("Goblin", "Wolf"));
-        } else if (difficulty <= 5) {
-            builder.withMonsterTypes(Arrays.asList("Goblin", "Orc", "Wolf"));
-        } else {
-            builder.withMonsterTypes(Arrays.asList("Orc", "Skeleton", "Wolf"));
+        } catch (Exception e) {
+            logger.severe("Error creating Goblin Cave: " + e.getMessage());
+            // Emergency fallback
+            return new Dungeon.DungeonBuilder("Emergency Cave")
+                    .addMonsterType("Goblin")
+                    .build();
         }
-
-        return builder.build();
     }
 
     /**
-     * Show available predefined dungeons
+     * Creates Swamp of Trolls using Builder Pattern
      */
-    public void showAvailableDungeons() {
-        System.out.println("\n=== AVAILABLE DUNGEONS ===");
-        System.out.println("1. Goblin Cave - Beginner dungeon (Difficulty 1)");
-        System.out.println("2. Orc Stronghold - Intermediate dungeon (Difficulty 3)");
-        System.out.println("3. Ancient Crypt - Advanced dungeon (Difficulty 5)");
-        System.out.println("\nYou can also create custom dungeons!");
+    public static Dungeon createSwampOfTrolls() {
+        try {
+            return new Dungeon.DungeonBuilder("Swamp of Trolls")
+                    .withDescription("A dangerous swamp where powerful trolls lurk. For experienced adventurers.")
+                    .withRooms(6)
+                    .withGoldReward(400)
+                    .withExperienceReward(300)
+                    .addMonsterType("Troll")
+                    .build();
+
+        } catch (Exception e) {
+            logger.severe("Error creating Swamp of Trolls: " + e.getMessage());
+            // Emergency fallback
+            return new Dungeon.DungeonBuilder("Emergency Swamp")
+                    .addMonsterType("Troll")
+                    .build();
+        }
+    }
+
+    /**
+     * Shows the TWO available dungeons
+     */
+    public static void showAvailableDungeons() {
+        try {
+            System.out.println("\n=== AVAILABLE DUNGEONS ===\n");
+
+            Dungeon goblinCave = createGoblinCave();
+            System.out.println("1. " + goblinCave.getName());
+            System.out.println("   " + goblinCave.toString());
+            System.out.println("   Difficulty: ★☆☆ (Beginner)");
+
+            System.out.println();
+
+            Dungeon trollSwamp = createSwampOfTrolls();
+            System.out.println("2. " + trollSwamp.getName());
+            System.out.println("   " + trollSwamp.toString());
+            System.out.println("   Difficulty: ★★★ (Advanced)");
+
+            System.out.println("\nChoose based on your experience level!");
+
+        } catch (Exception e) {
+            logger.severe("Error showing dungeons: " + e.getMessage());
+            System.out.println("Error displaying dungeons.");
+        }
+    }
+
+    /**
+     * Creates dungeon by choice - ONLY 1 or 2
+     */
+    public static Dungeon createDungeonByChoice(int choice) {
+        try {
+            switch (choice) {
+                case 1:
+                    System.out.println("\nYou chose the Goblin Cave!");
+                    return createGoblinCave();
+
+                case 2:
+                    System.out.println("\nYou chose the Swamp of Trolls!");
+                    return createSwampOfTrolls();
+
+                default:
+                    System.out.println("Invalid choice! Using Goblin Cave.");
+                    return createGoblinCave();
+            }
+        } catch (Exception e) {
+            logger.severe("Error creating dungeon: " + e.getMessage());
+            return createGoblinCave();
+        }
     }
 }
