@@ -29,11 +29,11 @@ public class GameLogger {
             gameLogger.setUseParentHandlers(false);
 
             ConsoleHandler handler = new ConsoleHandler();
-            handler.setLevel(Level.INFO);
+            handler.setLevel(Level.ALL);
             handler.setFormatter(new SimpleFormatter());
 
             gameLogger.addHandler(handler);
-            gameLogger.setLevel(Level.INFO);
+            gameLogger.setLevel(Level.ALL);
 
         } catch (Exception e) {
             // Fallback: if handler setup fails, still return working logger

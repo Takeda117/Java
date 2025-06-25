@@ -5,7 +5,6 @@ import com.exam.project.factoryMonster.AbstractMonster;
 import com.exam.project.factoryMonster.MonsterFactory;
 import com.exam.project.iterator.Item;
 import com.exam.project.security.InputValidator;
-import com.exam.project.strategy.CombatSystem;
 import com.exam.project.logger.GameLogger;
 
 import java.util.List;
