@@ -1,5 +1,7 @@
 package com.exam.project.factory;
 
+import java.lang.reflect.Field;
+
 /**
  * Factory for creating character objects
  * Implementa il Factory Method Pattern
@@ -41,5 +43,75 @@ public class CharacterFactory {
         System.out.println("Available character types:");
         System.out.println("- warrior: Strong fighter with high health");
         System.out.println("- mage: Magic user with spells");
+    }
+    
+    /**
+     * Crea un personaggio personalizzato con valori specifici
+     */
+    public Character createCustomCharacter(String type, String name, int health, int maxHealth, 
+                                          int stamina, int maxStamina, int baseDamage, int money, int level) {
+        Character character = createCharacter(type, name);
+        
+        if (character == null) {
+            return null;
+        }
+        
+        // Usa reflection per impostare i valori
+        try {
+            Class<?> clazz = AbstractCharacter.class;
+            setFieldValue(character, clazz, "health", health);
+            setFieldValue(character, clazz, "maxHealth", maxHealth);
+            setFieldValue(character, clazz, "stamina", stamina);
+            setFieldValue(character, clazz, "maxStamina", maxStamina);
+            setFieldValue(character, clazz, "baseDamage", baseDamage);
+            setFieldValue(character, clazz, "money", money);
+            setFieldValue(character, clazz, "level", level);
+        } catch (Exception e) {
+            // Ignora errori di reflection
+        }
+        
+        return character;
+    }
+    
+    /**
+     * Crea un mago personalizzato con valori specifici
+     */
+    public Character createCustomMage(String name, int health, int maxHealth, int stamina, int maxStamina,
+                                     int baseDamage, int money, int level, int mana, int maxMana) {
+        Character character = createCharacter("mage", name);
+        
+        if (character == null) {
+            return null;
+        }
+        
+        // Usa reflection per impostare i valori
+        try {
+            Class<?> abstractClass = AbstractCharacter.class;
+            setFieldValue(character, abstractClass, "health", health);
+            setFieldValue(character, abstractClass, "maxHealth", maxHealth);
+            setFieldValue(character, abstractClass, "stamina", stamina);
+            setFieldValue(character, abstractClass, "maxStamina", maxStamina);
+            setFieldValue(character, abstractClass, "baseDamage", baseDamage);
+            setFieldValue(character, abstractClass, "money", money);
+            setFieldValue(character, abstractClass, "level", level);
+            
+            // Imposta i valori specifici del mago
+            Class<?> mageClass = Mage.class;
+            setFieldValue(character, mageClass, "mana", mana);
+            setFieldValue(character, mageClass, "maxMana", maxMana);
+        } catch (Exception e) {
+            // Ignora errori di reflection
+        }
+        
+        return character;
+    }
+    
+    /**
+     * Utility method per impostare un campo tramite reflection
+     */
+    private void setFieldValue(Object obj, Class<?> clazz, String fieldName, Object value) throws Exception {
+        Field field = clazz.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(obj, value);
     }
 }

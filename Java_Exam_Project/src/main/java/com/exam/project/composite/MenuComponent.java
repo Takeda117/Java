@@ -19,6 +19,11 @@ public interface MenuComponent {
     void display();
     
     /**
+     * Get the name of this menu component
+     */
+    String getName();
+    
+    /**
      * Add a component to this menu component
      * Default implementation for leaf nodes
      */
@@ -33,17 +38,4 @@ public interface MenuComponent {
     default void remove(MenuComponent component) {
         throw new UnsupportedOperationException("Cannot remove from a leaf");
     }
-    
-    /**
-     * Get a child component at the specified index
-     * Default implementation for leaf nodes
-     */
-    default MenuComponent getChild(int index) {
-        throw new UnsupportedOperationException("Cannot get child from a leaf");
-    }
-    
-    /**
-     * Get the name of this menu component
-     */
-    String getName();
 }

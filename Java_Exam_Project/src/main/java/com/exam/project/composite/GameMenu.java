@@ -43,17 +43,6 @@ public class GameMenu implements MenuComponent {
     }
 
     /**
-     * Get a specific menu item
-     */
-    @Override
-    public MenuComponent getChild(int index) {
-        if (index >= 0 && index < menuItems.size()) {
-            return menuItems.get(index);
-        }
-        return null;
-    }
-
-    /**
      * Display and execute the menu
      */
     @Override
@@ -67,13 +56,22 @@ public class GameMenu implements MenuComponent {
             // Get user choice
             System.out.print("\nYour choice: ");
             String input = scanner.nextLine();
-            Integer choice = InputValidator.validateMenuChoice(input, menuItems.size());
+            
+            // Determina il numero massimo di opzioni
+            int maxOptions = menuItems.size();
+            
+            // Controlla se questo menu ha l'opzione 0 visibile
+            boolean hasZeroOption = !(title.contains("Menu Personaggio") || 
+                                     title.contains("Esplora Dungeon") || 
+                                     title.contains("Inventario"));
+            
+            Integer choice = InputValidator.validateMenuChoice(input, maxOptions);
 
             if (choice == null) {
                 continue;
             }
 
-            if (choice == 0) {
+            if (choice == 0 && hasZeroOption) {
                 // Exit this menu
                 continueMenu = false;
             } else if (choice > 0 && choice <= menuItems.size()) {
@@ -81,6 +79,14 @@ public class GameMenu implements MenuComponent {
                 MenuComponent selected = menuItems.get(choice - 1);
                 selected.execute();
 
+                // Se l'ultima opzione è "Torna al..." e l'utente l'ha selezionata, esci dal menu
+                if (choice == menuItems.size() && 
+                    selected.getName() != null && 
+                    (selected.getName().contains("Torna al") || 
+                     selected.getName().contains("Back to"))) {
+                    continueMenu = false;
+                }
+                
                 // If it was an action (not a submenu), we might want to pause
                 if (!(selected instanceof GameMenu)) {
                     System.out.println("\nPress Enter to continue...");
@@ -102,13 +108,23 @@ public class GameMenu implements MenuComponent {
             menuItems.get(i).display();
         }
 
-        System.out.println("0. Back/Exit");
+        // Mostra l'opzione di uscita appropriata in base al tipo di menu
+        if (title.contains("Menu Principale") || title.equals("RPG Adventure Game - Menu Principale")) {
+            System.out.println("0. Exit");
+        } else if (title.contains("Menu Personaggio") || 
+                   title.contains("Esplora Dungeon") || 
+                   title.contains("Inventario")) {
+            // Non mostrare l'opzione 0 per questi menu, dato che hanno già opzioni per tornare al menu precedente
+        } else {
+            System.out.println("0. Indietro");
+        }
     }
 
     /**
      * Get the menu title
      */
-    public String getTitle() {
+    @Override
+    public String getName() {
         return title;
     }
 }

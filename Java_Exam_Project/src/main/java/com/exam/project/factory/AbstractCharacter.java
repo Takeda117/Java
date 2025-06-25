@@ -60,21 +60,31 @@ public abstract class AbstractCharacter implements Character {
 
     /**
      * Restores stamina
-     * @param amount Amount of stamina to restore
+     * @param amount Amount of stamina to restore (negative values reduce stamina)
      */
     @Override
     public void restoreStamina(int amount) {
-        if (amount <= 0) {
-            return;
-        }
-        
         int oldStamina = stamina;
-        stamina = Math.min(maxStamina, stamina + amount);
         
-        int restored = stamina - oldStamina;
-        if (restored > 0) {
-            System.out.printf("%s restored %d stamina. Stamina: %d/%d%n", 
-                    name, restored, stamina, maxStamina);
+        if (amount > 0) {
+            // Restore stamina (positive amount)
+            stamina = Math.min(maxStamina, stamina + amount);
+            
+            int restored = stamina - oldStamina;
+            if (restored > 0) {
+                System.out.printf("%s restored %d stamina. Stamina: %d/%d%n", 
+                        name, restored, stamina, maxStamina);
+            }
+        } else if (amount < 0) {
+            // Reduce stamina (negative amount)
+            int reduction = Math.abs(amount);
+            stamina = Math.max(0, stamina - reduction);
+            
+            int reduced = oldStamina - stamina;
+            if (reduced > 0) {
+                System.out.printf("%s used %d stamina. Stamina: %d/%d%n", 
+                        name, reduced, stamina, maxStamina);
+            }
         }
     }
 

@@ -6,6 +6,7 @@ import com.exam.project.factory.Warrior;
 import com.exam.project.factory.Mage;
 import com.exam.project.logger.GameLogger;
 import com.exam.project.security.InputValidator;
+import com.exam.project.security.ExceptionHandler;
 
 import java.io.*;
 import java.util.Properties;
@@ -76,12 +77,17 @@ public class CharacterManagement {
                 logger.info("Saved mage-specific data for: " + character.getName());
             }
 
-            // Write to file
-            File saveFile = new File(SAVE_DIR + "/" + safeFilename);
+            // Write to file - aggiungiamo l'estensione se non è già presente
+            String fullFilename = safeFilename;
+            if (!fullFilename.endsWith(FILE_EXT)) {
+                fullFilename += FILE_EXT;
+            }
+            
+            File saveFile = new File(SAVE_DIR + "/" + fullFilename);
             try (FileOutputStream out = new FileOutputStream(saveFile)) {
                 props.store(out, "Character Save");
-                logger.info("Character saved successfully: " + character.getName());
-                System.out.println("Character saved!");
+                logger.info("Character saved successfully: " + character.getName() + " to " + saveFile.getAbsolutePath());
+                System.out.println("Character saved to " + saveFile.getAbsolutePath());
                 return true;
             }
         } catch (IOException e) {
