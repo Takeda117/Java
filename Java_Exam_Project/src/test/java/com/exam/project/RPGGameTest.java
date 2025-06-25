@@ -291,7 +291,8 @@ public class RPGGameTest {
             mage.train();
 
             assertTrue(mage.getBaseDamage() > startDamage);
-            assertTrue(mage.getMaxStamina() < startMaxStamina);
+            assertTrue(mage.getMaxStamina() > startMaxStamina);
+
             logger.info("Training test passed");
         } catch (Exception e) {
             logger.severe("Training test failed: " + e.getMessage());
