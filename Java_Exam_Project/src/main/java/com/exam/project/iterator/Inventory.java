@@ -1,5 +1,7 @@
 package com.exam.project.iterator;
 
+import com.exam.project.strategy.InventorySortStrategy;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -235,6 +237,27 @@ public class Inventory implements Iterable<Item> {
             }
         }
     }
+
+    private InventorySortStrategy sortStrategy;
+
+    /**
+     * Sets the inventory sorting strategy.
+     *
+     * @param sortStrategy the sorting strategy to use
+     */
+    public void setSortStrategy(InventorySortStrategy sortStrategy) {
+        this.sortStrategy = sortStrategy;
+    }
+
+    /**
+     * Sorts the inventory using the currently set strategy.
+     */
+    public void sort() {
+        if (sortStrategy != null) {
+            sortStrategy.sort(this.items); // 'items' is your List<Item>
+        }
+    }
+
 
     // Getters for inventory state
     public int getSize() {
