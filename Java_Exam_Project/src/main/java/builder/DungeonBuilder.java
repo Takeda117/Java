@@ -1,4 +1,4 @@
-package builder;
+package java.builder;
 
 /**
  * DungeonBuilder - Interface for the Builder Pattern implementation

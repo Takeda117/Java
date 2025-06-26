@@ -1,17 +1,46 @@
-package security;
+package java.security;
 
-import logger.GameLogger;
+import java.logger.GameLogger;
 import java.util.logging.Logger;
 
 /**
- * Simple input validation
+ * InputValidator - Provides input validation and sanitization
+ * <p>
+ * This class contains utility methods for validating and sanitizing
+ * various types of user input. It helps ensure that all data entering
+ * the system meets the required format and security constraints.
+ * </p>
+ * <p>
+ * The validator provides methods for common input types in the game:
+ * <ul>
+ *   <li>Character names</li>
+ *   <li>Menu selections</li>
+ *   <li>Yes/no responses</li>
+ *   <li>Filenames (with security measures against path traversal)</li>
+ * </ul>
+ * </p>
+ * <p>
+ * All validation methods log their activity and provide user-friendly
+ * error messages when validation fails.
+ * </p>
  */
 public class InputValidator {
 
   private static final Logger logger = GameLogger.getLogger();
 
   /**
-   * Check character name
+   * Validates a character name
+   * <p>
+   * Ensures that character names meet the game's requirements:
+   * <ul>
+   *   <li>Not null or empty</li>
+   *   <li>At least 2 characters long</li>
+   *   <li>No more than 20 characters long</li>
+   * </ul>
+   * </p>
+   * 
+   * @param input The character name to validate
+   * @return The validated name, or null if validation fails
    */
   public static String validateCharacterName(String input) {
     logger.info("Validating character name: " + input);
@@ -47,7 +76,15 @@ public class InputValidator {
   }
 
   /**
-   * Check menu choice
+   * Validates a menu choice
+   * <p>
+   * Ensures that menu selections are valid integers within the
+   * acceptable range for the current menu.
+   * </p>
+   * 
+   * @param input The user's input string
+   * @param max The maximum valid menu option number
+   * @return The validated menu choice as an Integer, or null if validation fails
    */
   public static Integer validateMenuChoice(String input, int max) {
     logger.info("Validating menu choice: " + input + " (max: " + max + ")");
@@ -81,7 +118,14 @@ public class InputValidator {
   }
 
   /**
-   * Check yes/no
+   * Validates a yes/no response
+   * <p>
+   * Interprets various forms of affirmative responses (y, yes, s, si)
+   * as true, and any other input as false.
+   * </p>
+   * 
+   * @param input The user's input string
+   * @return true for affirmative responses, false otherwise
    */
   public static boolean validateYesNo(String input) {
     logger.info("Validating yes/no input: " + input);
@@ -105,7 +149,19 @@ public class InputValidator {
   }
 
   /**
-   * Check filename
+   * Validates a filename
+   * <p>
+   * Ensures that filenames meet the system's requirements and security constraints:
+   * <ul>
+   *   <li>Not null or empty</li>
+   *   <li>No more than 30 characters long</li>
+   *   <li>Contains only safe characters (via sanitization)</li>
+   * </ul>
+   * The method automatically appends the ".save" extension to valid filenames.
+   * </p>
+   * 
+   * @param input The filename to validate
+   * @return The validated filename with extension, or null if validation fails
    */
   public static String validateFilename(String input) {
     logger.info("Validating filename: " + input);
@@ -144,7 +200,14 @@ public class InputValidator {
   }
 
   /**
-   * Sanitize filename to prevent path traversal attacks
+   * Sanitizes a filename to prevent path traversal attacks
+   * <p>
+   * Removes dangerous characters and patterns that could be used for
+   * directory traversal or other file system attacks.
+   * </p>
+   * 
+   * @param input The filename to sanitize
+   * @return The sanitized filename, or an empty string if the input is invalid
    */
   public static String sanitizeFilename(String input) {
     if (input == null) {
@@ -157,10 +220,10 @@ public class InputValidator {
       return "";
     }
 
-    // Rimuovi caratteri pericolosi e path traversal
+    // Remove dangerous characters and path traversal
     name = name.replaceAll("[^a-zA-Z0-9_\\-]", "_");
 
-    // Previeni path traversal
+    // Prevent path traversal
     if (name.contains("..")
         || name.startsWith(".")
         || name.startsWith("/")
@@ -171,6 +234,16 @@ public class InputValidator {
     return name;
   }
 
+  /**
+   * Sanitizes general input by trimming whitespace
+   * <p>
+   * Provides a simple way to clean up user input by removing
+   * leading and trailing whitespace.
+   * </p>
+   * 
+   * @param string The input string to sanitize
+   * @return The sanitized string, or an empty string if input is null
+   */
   public static String sanitizeInput(String string) {
     if (string == null) {
       return "";

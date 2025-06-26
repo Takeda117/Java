@@ -1,55 +1,73 @@
-package combat;
+package java.combat;
 
-import factory.Character;
-import factoryMonster.AbstractMonster;
-import logger.GameLogger;
+import java.factory.Character;
+import java.factoryMonster.AbstractMonster;
+import java.logger.GameLogger;
 import java.util.logging.Logger;
 
 /**
- * Sistema di combattimento semplificato
+ * CombatSystem - Implements a simplified combat system
+ * <p>
+ * This class handles combat interactions between characters and monsters,
+ * including attack execution and damage calculation.
+ * </p>
  */
 public class CombatSystem {
     
     private static final Logger logger = GameLogger.getLogger();
     
     /**
-     * Esegue un attacco del personaggio contro un mostro
+     * Executes an attack from a character against a monster
+     * <p>
+     * This method handles the character's attack, calculates damage,
+     * and applies it to the monster if the attack is successful.
+     * </p>
+     * 
+     * @param character The character performing the attack
+     * @param monster The monster being attacked
      */
     public void executeAttack(Character character, AbstractMonster monster) {
         if (character == null || monster == null) {
-            logger.warning("Attacco fallito: personaggio o mostro nullo");
+            logger.warning("Attack failed: character or monster is null");
             return;
         }
         
         int damage = character.attack();
         if (damage > 0) {
             monster.takeDamage(damage);
-            logger.info(character.getName() + " ha inflitto " + damage + " danni a " + monster.getType());
-            System.out.println("Hai inflitto " + damage + " danni!");
+            logger.info(character.getName() + " dealt " + damage + " damage to " + monster.getType());
+            System.out.println("You dealt " + damage + " damage!");
         } else {
-            logger.info(character.getName() + " ha mancato il bersaglio");
-            System.out.println("Hai mancato il bersaglio!");
+            logger.info(character.getName() + " missed the target");
+            System.out.println("You missed the target!");
         }
 
     }
     
     /**
-     * Esegue un attacco del mostro contro un personaggio
+     * Executes an attack from a monster against a character
+     * <p>
+     * This method handles the monster's attack, calculates damage,
+     * and applies it to the character if the attack is successful.
+     * </p>
+     * 
+     * @param monster The monster performing the attack
+     * @param character The character being attacked
      */
     public void executeMonsterAttack(AbstractMonster monster, Character character) {
         if (monster == null || character == null) {
-            logger.warning("Attacco mostro fallito: mostro o personaggio nullo");
+            logger.warning("Monster attack failed: monster or character is null");
             return;
         }
         
         int damage = monster.attack();
         if (damage > 0) {
             character.takeDamage(damage);
-            logger.info(monster.getType() + " ha inflitto " + damage + " danni a " + character.getName());
-            System.out.println(monster.getType() + " ti ha inflitto " + damage + " danni!");
+            logger.info(monster.getType() + " dealt " + damage + " damage to " + character.getName());
+            System.out.println(monster.getType() + " dealt " + damage + " damage to you!");
         } else {
-            logger.info(monster.getType() + " ha mancato il colpo");
-            System.out.println(monster.getType() + " ha mancato il colpo!");
+            logger.info(monster.getType() + " missed the attack");
+            System.out.println(monster.getType() + " missed the attack!");
         }
 
     }

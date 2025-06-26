@@ -1,17 +1,28 @@
-package menu;
+package java.menu;
 
 import composite.*;
-import factory.Character;
-import factory.CharacterFactory;
-import io.CharacterManagement;
-import security.InputValidator;
-import logger.GameLogger;
+import java.factory.Character;
+import java.factory.CharacterFactory;
+import java.io.CharacterManagement;
+import java.security.InputValidator;
+import java.logger.GameLogger;
 
 import java.util.Scanner;
 import java.util.logging.Logger;
 
 /**
  * MainMenu - Manages the main game menu
+ * <p>
+ * This class is responsible for building and executing the main menu of the game.
+ * It provides options for creating new characters, loading existing characters,
+ * and exiting the game. The class uses the Composite pattern through the GameMenu
+ * and MenuItem classes to structure the menu hierarchy.
+ * </p>
+ * <p>
+ * The MainMenu serves as the entry point for player interaction with the game,
+ * and handles navigation to character-specific menus when a character is created
+ * or loaded.
+ * </p>
  */
 public class MainMenu {
     private static final Logger logger = GameLogger.getLogger();
@@ -19,6 +30,13 @@ public class MainMenu {
 
     /**
      * Builds and returns the main menu
+     * <p>
+     * Creates a GameMenu instance with options for creating a new character,
+     * loading an existing character, and exiting the game. Each option is
+     * associated with the appropriate action method.
+     * </p>
+     * 
+     * @return A configured GameMenu instance for the main menu
      */
     public static GameMenu buildMainMenu() {
         try {
@@ -37,6 +55,11 @@ public class MainMenu {
 
     /**
      * Creates a new character and navigates to character menu
+     * <p>
+     * Prompts the user to select a character type and enter a name,
+     * then creates a new character using the CharacterFactory.
+     * If successful, it displays the character menu for the new character.
+     * </p>
      */
     private static void createNewCharacter() {
         System.out.println("\n=== CREA NUOVO PERSONAGGIO ===");
@@ -67,6 +90,11 @@ public class MainMenu {
 
     /**
      * Loads an existing character and navigates to character menu
+     * <p>
+     * Displays a list of available save files and prompts the user to select one.
+     * If a valid selection is made, it loads the character from the save file
+     * and displays the character menu for the loaded character.
+     * </p>
      */
     private static void loadCharacter() {
         System.out.println("\n=== CARICA PERSONAGGIO ===");
@@ -96,6 +124,9 @@ public class MainMenu {
 
     /**
      * Exits the game
+     * <p>
+     * Displays a farewell message, logs the exit action, and terminates the application.
+     * </p>
      */
     private static void exitGame() {
         System.out.println("\nGrazie per aver giocato!");
@@ -105,6 +136,12 @@ public class MainMenu {
 
     /**
      * Runs the main menu
+     * <p>
+     * Builds the main menu and executes it, handling any exceptions that may occur.
+     * This is the primary entry point for starting the game's menu system.
+     * </p>
+     * 
+     * @throws RuntimeException if an unrecoverable error occurs while running the menu
      */
     public static void runMainMenu() {
         try {

@@ -1,0 +1,11 @@
+#Character Save
+#Thu Jun 26 22:27:01 CEST 2025
+damage=17
+health=108
+level=2
+maxHealth=125
+maxStamina=100
+money=50
+name=arancino
+stamina=85
+type=Warrior

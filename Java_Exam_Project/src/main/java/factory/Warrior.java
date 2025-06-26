@@ -1,11 +1,16 @@
-package factory;
+package java.factory;
 
-import iterator.Item;
-import iterator.Inventory;
+import java.iterator.Item;
+import java.iterator.Inventory;
 import java.util.Random;
 
 /**
  * Warrior character class
+ * <p>
+ * This class represents a warrior character type in the game.
+ * It extends AbstractCharacter and implements warrior-specific
+ * behaviors. Warriors have high health and physical damage.
+ * </p>
  */
 public class Warrior extends AbstractCharacter {
 
@@ -14,6 +19,7 @@ public class Warrior extends AbstractCharacter {
 
     /**
      * Creates a new Warrior
+     * 
      * @param name The warrior's name
      */
     public Warrior(String name) {
@@ -22,8 +28,9 @@ public class Warrior extends AbstractCharacter {
     }
 
     /**
-     * Warrior attack
-     * @return Damage dealt
+     * Performs a warrior attack
+     * 
+     * @return Damage dealt by the attack, or 0 if the attack fails
      */
     @Override
     public int attack() {
@@ -42,7 +49,7 @@ public class Warrior extends AbstractCharacter {
     }
 
     /**
-     * Warrior training
+     * Implements warrior-specific training
      */
     @Override
     protected void performTraining() {
@@ -53,7 +60,8 @@ public class Warrior extends AbstractCharacter {
     }
 
     /**
-     * Equips an item
+     * Equips an item to the warrior
+     * 
      * @param item The item to equip
      */
     @Override
@@ -72,7 +80,8 @@ public class Warrior extends AbstractCharacter {
     }
 
     /**
-     * Adds an item
+     * Adds an item to the warrior's inventory
+     * 
      * @param item The item to add
      */
     @Override
@@ -87,7 +96,7 @@ public class Warrior extends AbstractCharacter {
     }
 
     /**
-     * Shows inventory
+     * Shows the warrior's inventory
      */
     @Override
     public void showInventory() {
@@ -105,15 +114,18 @@ public class Warrior extends AbstractCharacter {
     }
 
     /**
-     * Gets stamina recovery rate
-     * @return Recovery rate
+     * Gets the warrior's stamina recovery rate
+     * 
+     * @return The stamina recovery rate as a decimal
      */
     public double getStaminaRecoveryRate() {
         return 0.05;
     }
 
     /**
-     * toString implementation
+     * Returns a string representation of the warrior
+     * 
+     * @return A formatted string with the warrior's stats
      */
     @Override
     public String toString() {

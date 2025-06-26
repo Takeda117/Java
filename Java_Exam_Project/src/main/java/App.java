@@ -1,4 +1,5 @@
-import logger.GameLogger;
+package java;
+import java.logger.GameLogger;
 import java.util.logging.Logger;
 
 /**

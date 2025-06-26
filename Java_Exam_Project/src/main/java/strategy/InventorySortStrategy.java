@@ -1,5 +1,5 @@
-package strategy;
-import iterator.Item;
+package java.strategy;
+import java.iterator.Item;
 import java.util.List;
 
 /**

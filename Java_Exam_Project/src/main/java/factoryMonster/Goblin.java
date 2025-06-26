@@ -1,44 +1,59 @@
 
-package factoryMonster;
+package java.factoryMonster;
 
-import iterator.Item;
-import logger.GameLogger;
+import java.iterator.Item;
+import java.logger.GameLogger;
 import java.util.logging.Logger;
 
 /**
- * Goblin - Mostro base della Goblin Cave
+ * Goblin - Basic monster of the Goblin Cave
+ * <p>
+ * This class represents a Goblin monster type with specific
+ * stats and behaviors. Goblins are weaker monsters with
+ * moderate health and damage.
+ * </p>
  */
 public class Goblin extends AbstractMonster {
     
     private static final Logger logger = GameLogger.getLogger();
 
     /**
-     * Costruttore per creare un Goblin
+     * Constructor for creating a Goblin
      */
     public Goblin() {
         super(
-                "Goblin",       // Nome
-                "Goblin",       // Tipo
-                20,             // Vita
-                5,              // Danno
-                10,             // Oro
-                50              // 50% probabilità di drop
+                "Goblin",       // Name
+                "Goblin",       // Type
+                20,             // Health
+                5,              // Damage
+                10,             // Gold
+                50              // 50% drop chance
         );
         
-        // Aggiunge un possibile drop
-        addPossibleDrop(new Item("Pozione di Cura", Item.ItemType.POTION, 15, 0));
-        logger.info("Goblin creato con " + health + " HP");
+        // Add a possible drop
+        addPossibleDrop(new Item("Health Potion", Item.ItemType.POTION, 15, 0));
+        logger.info("Goblin created with " + health + " HP");
     }
     
+    /**
+     * Goblin attack implementation
+     * 
+     * @return The damage dealt by the attack
+     */
     @Override
     public int attack() {
         int damage = super.attack();
-        logger.info("Goblin attacca per " + damage + " danni");
+        logger.info("Goblin attacks for " + damage + " damage");
         return damage;
     }
     
+    /**
+     * Returns a string representation of the Goblin
+     * 
+     * @return Formatted string with Goblin stats
+     */
     @Override
     public String toString() {
-        return "Goblin [Vita: " + health + "/" + maxHealth + ", Danno: " + baseDamage + "]";
+        return "Goblin [Health: " + health + "/" + maxHealth + ", Damage: " + baseDamage + "]";
     }
 }

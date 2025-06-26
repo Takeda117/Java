@@ -1,9 +1,15 @@
-package factory;
+package java.factory;
 
-import iterator.Item;
+import java.iterator.Item;
 
 /**
  * Base class for all characters
+ * <p>
+ * This abstract class implements the Character interface and provides
+ * common functionality for all character types. It serves as part of the
+ * Factory Pattern implementation by defining the template for concrete
+ * character classes.
+ * </p>
  */
 public abstract class AbstractCharacter implements Character {
     
@@ -17,7 +23,12 @@ public abstract class AbstractCharacter implements Character {
     protected int level;
 
     /**
-     * Constructor
+     * Constructor for creating a new character
+     * 
+     * @param name The character's name
+     * @param baseHealth The initial and maximum health
+     * @param baseStamina The initial and maximum stamina
+     * @param baseDamage The base damage value
      */
     protected AbstractCharacter(String name, int baseHealth, int baseStamina, int baseDamage) {
         this.name = (name != null && !name.trim().isEmpty()) ? name.trim() : "Unknown";
@@ -31,7 +42,8 @@ public abstract class AbstractCharacter implements Character {
     }
 
     /**
-     * Takes damage
+     * Takes damage from an attack
+     * 
      * @param damage Amount of damage to take
      */
     @Override
@@ -51,6 +63,7 @@ public abstract class AbstractCharacter implements Character {
 
     /**
      * Checks if character is alive
+     * 
      * @return true if health > 0, false otherwise
      */
     @Override
@@ -59,8 +72,9 @@ public abstract class AbstractCharacter implements Character {
     }
 
     /**
-     * Restores stamina
-     * @param amount Amount of stamina to restore (negative values reduce stamina)
+     * Restores or reduces stamina
+     * 
+     * @param amount Amount of stamina to restore (positive) or reduce (negative)
      */
     @Override
     public void restoreStamina(int amount) {
@@ -89,7 +103,7 @@ public abstract class AbstractCharacter implements Character {
     }
 
     /**
-     * Rest to recover stamina
+     * Rests to recover stamina
      */
     @Override
     public void rest() {
@@ -98,7 +112,7 @@ public abstract class AbstractCharacter implements Character {
     }
 
     /**
-     * Train to improve stats
+     * Trains to improve stats
      */
     @Override
     public void train() {
@@ -115,66 +129,107 @@ public abstract class AbstractCharacter implements Character {
     }
 
     /**
-     * Abstract method for subclass-specific training
+     * Abstract method for subclass-specific training implementation
      */
     protected abstract void performTraining();
 
     /**
-     * Equip an item
+     * Equips an item
+     * 
      * @param item The item to equip
      */
     @Override
     public abstract void equipItem(Item item);
 
     /**
-     * Add an item to inventory
+     * Adds an item to inventory
+     * 
      * @param item The item to add
      */
     @Override
     public abstract void addItem(Item item);
 
     /**
-     * Show inventory contents
+     * Shows inventory contents
      */
     @Override
     public abstract void showInventory();
 
-    // Getters
+    /**
+     * Gets the character's name
+     * 
+     * @return The character's name
+     */
     @Override
     public String getName() {
         return name;
     }
 
+    /**
+     * Gets the character's current health
+     * 
+     * @return The current health value
+     */
     @Override
     public int getHealth() {
         return health;
     }
 
+    /**
+     * Gets the character's maximum health
+     * 
+     * @return The maximum health value
+     */
     @Override
     public int getMaxHealth() {
         return maxHealth;
     }
 
+    /**
+     * Gets the character's current stamina
+     * 
+     * @return The current stamina value
+     */
     @Override
     public int getStamina() {
         return stamina;
     }
 
+    /**
+     * Gets the character's maximum stamina
+     * 
+     * @return The maximum stamina value
+     */
     @Override
     public int getMaxStamina() {
         return maxStamina;
     }
 
+    /**
+     * Gets the character's base damage
+     * 
+     * @return The base damage value
+     */
     @Override
     public int getBaseDamage() {
         return baseDamage;
     }
 
+    /**
+     * Gets the character's money
+     * 
+     * @return The amount of money
+     */
     @Override
     public int getMoney() {
         return money;
     }
 
+    /**
+     * Gets the character's level
+     * 
+     * @return The character's level
+     */
     @Override
     public int getLevel() {
         return level;

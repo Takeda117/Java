@@ -1,6 +1,6 @@
-package strategy;
+package java.strategy;
 
-import iterator.Item;
+import java.iterator.Item;
 
 import java.util.Comparator;
 import java.util.List;

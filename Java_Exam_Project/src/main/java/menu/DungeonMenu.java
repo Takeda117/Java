@@ -1,17 +1,28 @@
-package menu;
+package java.menu;
 
 import composite.*;
-import factory.Character;
-import builder.ConcreteDungeonBuilder;
-import builder.Dungeon;
-import builder.DungeonBuilder;
-import builder.DungeonExplorer;
-import menu.CharacterMenu.ReturnToMainMenuException;
-import logger.GameLogger;
+import java.factory.Character;
+import java.builder.ConcreteDungeonBuilder;
+import java.builder.Dungeon;
+import java.builder.DungeonBuilder;
+import java.builder.DungeonExplorer;
+import java.menu.CharacterMenu.ReturnToMainMenuException;
+import java.logger.GameLogger;
+import java.security.ExceptionHandler;
 import java.util.logging.Logger;
 
 /**
  * DungeonMenu - Manages dungeon exploration menu
+ * <p>
+ * This class is responsible for building and executing the dungeon exploration menu.
+ * It provides options for exploring different dungeons and handles the creation
+ * of dungeon instances using the Builder pattern. The class uses the Composite pattern
+ * through the GameMenu and MenuItem classes to structure the menu hierarchy.
+ * </p>
+ * <p>
+ * The DungeonMenu integrates with the DungeonExplorer to manage the actual
+ * exploration process and combat encounters within dungeons.
+ * </p>
  */
 public class DungeonMenu {
     private static final Logger logger = GameLogger.getLogger();
@@ -19,6 +30,13 @@ public class DungeonMenu {
     
     /**
      * Shows dungeon menu
+     * <p>
+     * Displays and executes the dungeon exploration menu for a specific character,
+     * handling character state validation and menu navigation.
+     * </p>
+     * 
+     * @param character The character for which to show the dungeon menu
+     * @throws ReturnToMainMenuException if the user chooses to return to the main menu
      */
     public static void showDungeonMenu(Character character) {
         if (character == null || !character.isAlive()) {
@@ -40,12 +58,18 @@ public class DungeonMenu {
             throw e;
         } catch (Exception e) {
             logger.severe("Errore nel menu dungeon: " + e.getMessage());
-            security.ExceptionHandler.handleException(e, "Errore nel menu dungeon.");
+            ExceptionHandler.handleException(e, "Errore nel menu dungeon.");
         }
     }
     
     /**
      * Enters Goblin Cave dungeon
+     * <p>
+     * Creates a Goblin Cave dungeon instance and initiates the exploration
+     * process for the specified character.
+     * </p>
+     * 
+     * @param character The character that will explore the dungeon
      */
     private static void enterGoblinCave(Character character) {
         System.out.println("\n=== GOBLIN CAVE ===");
@@ -57,6 +81,12 @@ public class DungeonMenu {
     
     /**
      * Enters Swamp of Trolls dungeon
+     * <p>
+     * Creates a Swamp of Trolls dungeon instance and initiates the exploration
+     * process for the specified character.
+     * </p>
+     * 
+     * @param character The character that will explore the dungeon
      */
     private static void enterSwamp(Character character) {
         System.out.println("\n=== SWAMP OF TROLLS ===");
@@ -68,6 +98,16 @@ public class DungeonMenu {
     
     /**
      * Builds a dungeon with specified parameters
+     * <p>
+     * Uses the DungeonBuilder to create a dungeon with the specified name,
+     * description, gold reward, and monster type.
+     * </p>
+     * 
+     * @param name The name of the dungeon
+     * @param description The description of the dungeon
+     * @param goldReward The gold reward for completing the dungeon
+     * @param monsterType The type of monsters in the dungeon
+     * @return A configured Dungeon instance
      */
     private static Dungeon buildDungeon(String name, String description, int goldReward, String monsterType) {
         return dungeonBuilder.reset()
@@ -80,6 +120,13 @@ public class DungeonMenu {
     
     /**
      * Explores a dungeon with a character
+     * <p>
+     * Uses the DungeonExplorer to manage the exploration process for a character
+     * in a specific dungeon, including combat encounters and rewards.
+     * </p>
+     * 
+     * @param character The character that will explore the dungeon
+     * @param dungeon The dungeon to explore
      */
     private static void exploreDungeon(Character character, Dungeon dungeon) {
         new DungeonExplorer()

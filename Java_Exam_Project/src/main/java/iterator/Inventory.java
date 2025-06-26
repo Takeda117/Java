@@ -1,14 +1,23 @@
-package iterator;
+package java.iterator;
 
-import strategy.InventorySortStrategy;
+import java.strategy.InventorySortStrategy;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Inventory - Manages character items using Collections Framework
- * Implements Iterable to support the Iterator Pattern
- * Uses Generics for type safety
+ * <p>
+ * This class implements the inventory system for game characters,
+ * providing storage and management of items. It uses the Java Collections
+ * Framework for internal storage and implements the Iterable interface
+ * to support the Iterator Pattern.
+ * </p>
+ * <p>
+ * The inventory supports operations like adding, removing, and equipping items,
+ * as well as various query methods. It also integrates with the Strategy Pattern
+ * for flexible sorting of items.
+ * </p>
  */
 public class Inventory implements Iterable<Item> {
 
@@ -22,10 +31,12 @@ public class Inventory implements Iterable<Item> {
 
     /**
      * Constructor with configurable capacity
+     * 
+     * @param maxCapacity The maximum number of items the inventory can hold
      */
     public Inventory(int maxCapacity) {
-        // Ignoriamo il parametro maxCapacity poiché non c'è più un limite
-        this.maxCapacity = Integer.MAX_VALUE; // Impostiamo un valore molto alto
+        // We ignore the maxCapacity parameter as there's no longer a limit
+        this.maxCapacity = Integer.MAX_VALUE; // Set to a very high value
         this.items = new ArrayList<>();
         this.equippedItems = new HashMap<>();
     }
@@ -34,20 +45,22 @@ public class Inventory implements Iterable<Item> {
      * Default constructor with standard capacity
      */
     public Inventory() {
-        this(Integer.MAX_VALUE); // Impostiamo un valore molto alto
+        this(Integer.MAX_VALUE); // Set to a very high value
     }
 
-    
     /**
      * Adds an item to the inventory
-     * @return true if item was added
+     * 
+     * @param item The item to add
+     * @return true if the item was added successfully, false otherwise
+     * @throws IllegalArgumentException if the item is null
      */
     public boolean addItem(Item item) {
         if (item == null) {
             throw new IllegalArgumentException("Cannot add null item to inventory");
         }
 
-        // Rimuovo il controllo sulla capacità massima
+        // Capacity check removed as inventory is no longer limited
         items.add(item);
         System.out.println("Added " + item.getName() + " to inventory");
         return true;
@@ -55,6 +68,9 @@ public class Inventory implements Iterable<Item> {
 
     /**
      * Removes an item from the inventory
+     * 
+     * @param item The item to remove
+     * @return true if the item was removed successfully, false otherwise
      */
     public boolean removeItem(Item item) {
         if (item == null) {
@@ -75,6 +91,9 @@ public class Inventory implements Iterable<Item> {
 
     /**
      * Equips an item (for weapons and armor)
+     * 
+     * @param item The item to equip
+     * @return true if the item was equipped successfully, false otherwise
      */
     public boolean equipItem(Item item) {
         if (item == null || !item.isEquippable()) {
@@ -99,6 +118,9 @@ public class Inventory implements Iterable<Item> {
 
     /**
      * Unequips an item
+     * 
+     * @param item The item to unequip
+     * @return true if the item was unequipped successfully, false otherwise
      */
     public boolean unequipItem(Item item) {
         if (item == null || !equippedItems.containsValue(item)) {
@@ -112,6 +134,9 @@ public class Inventory implements Iterable<Item> {
 
     /**
      * Checks if an item is currently equipped
+     * 
+     * @param item The item to check
+     * @return true if the item is equipped, false otherwise
      */
     public boolean isEquipped(Item item) {
         return equippedItems.containsValue(item);
@@ -119,6 +144,8 @@ public class Inventory implements Iterable<Item> {
 
     /**
      * Gets all equipped items
+     * 
+     * @return A collection of all equipped items
      */
     public Collection<Item> getEquippedItems() {
         return new ArrayList<>(equippedItems.values());
@@ -126,6 +153,9 @@ public class Inventory implements Iterable<Item> {
 
     /**
      * Gets items by type using Java 8 Streams (modern approach)
+     * 
+     * @param type The type of items to retrieve
+     * @return A list of items of the specified type
      */
     public List<Item> getItemsByType(Item.ItemType type) {
         return items.stream()
@@ -135,6 +165,8 @@ public class Inventory implements Iterable<Item> {
 
     /**
      * Calculates total value of all items
+     * 
+     * @return The total gold value of all items in the inventory
      */
     public int getTotalValue() {
         return items.stream()
@@ -144,6 +176,8 @@ public class Inventory implements Iterable<Item> {
 
     /**
      * Gets total stat bonus from equipped items
+     * 
+     * @return The total stat bonus from all equipped items
      */
     public int getTotalStatBonus() {
         return equippedItems.values().stream()
@@ -153,6 +187,9 @@ public class Inventory implements Iterable<Item> {
 
     /**
      * Sells an item (removes it and returns its value)
+     * 
+     * @param item The item to sell
+     * @return The gold value received from selling the item, or 0 if the sale failed
      */
     public int sellItem(Item item) {
         if (item == null || !items.contains(item)) {
@@ -167,7 +204,11 @@ public class Inventory implements Iterable<Item> {
 
     /**
      * Iterator Pattern implementation
-     * Allows for-each loops over inventory items
+     * <p>
+     * Allows for-each loops over inventory items.
+     * </p>
+     * 
+     * @return An iterator over the items in the inventory
      */
     @Override
     public Iterator<Item> iterator() {
@@ -176,16 +217,30 @@ public class Inventory implements Iterable<Item> {
 
     /**
      * Custom Iterator implementation
-     * This satisfies the Iterator Pattern requirement
+     * <p>
+     * This private inner class provides the Iterator Pattern implementation
+     * for the inventory, allowing iteration over all items.
+     * </p>
      */
     private class InventoryIterator implements Iterator<Item> {
         private int currentIndex = 0;
 
+        /**
+         * Checks if there are more items to iterate over
+         * 
+         * @return true if there are more items, false otherwise
+         */
         @Override
         public boolean hasNext() {
             return currentIndex < items.size();
         }
 
+        /**
+         * Returns the next item in the iteration
+         * 
+         * @return The next item
+         * @throws NoSuchElementException if there are no more items
+         */
         @Override
         public Item next() {
             if (!hasNext()) {
@@ -194,6 +249,11 @@ public class Inventory implements Iterable<Item> {
             return items.get(currentIndex++);
         }
 
+        /**
+         * Removes the last item returned by the iterator
+         * 
+         * @throws IllegalStateException if next() has not been called, or remove() has already been called after the last call to next()
+         */
         @Override
         public void remove() {
             if (currentIndex <= 0) {
@@ -205,6 +265,10 @@ public class Inventory implements Iterable<Item> {
 
     /**
      * Displays inventory contents
+     * <p>
+     * Prints a formatted representation of the inventory to the console,
+     * including all items grouped by type and their equipped status.
+     * </p>
      */
     public void displayInventory() {
         System.out.println("\n=== INVENTORY ===");
@@ -232,46 +296,75 @@ public class Inventory implements Iterable<Item> {
         }
     }
 
+    // Strategy Pattern implementation for sorting
     private InventorySortStrategy sortStrategy;
 
     /**
-     * Sets the inventory sorting strategy.
-     *
-     * @param sortStrategy the sorting strategy to use
+     * Sets the inventory sorting strategy
+     * <p>
+     * This method implements the Strategy Pattern for sorting inventory items.
+     * </p>
+     * 
+     * @param sortStrategy The sorting strategy to use
      */
     public void setSortStrategy(InventorySortStrategy sortStrategy) {
         this.sortStrategy = sortStrategy;
     }
 
     /**
-     * Sorts the inventory using the currently set strategy.
+     * Sorts the inventory using the currently set strategy
+     * <p>
+     * If no strategy is set, this method does nothing.
+     * </p>
      */
     public void sort() {
         if (sortStrategy != null) {
-            sortStrategy.sort(this.items); // 'items' is your List<Item>
+            sortStrategy.sort(this.items);
         }
     }
 
-
     // Getters for inventory state
+
+    /**
+     * Gets the current number of items in the inventory
+     * 
+     * @return The number of items
+     */
     public int getSize() {
         return items.size();
     }
 
+    /**
+     * Gets the maximum capacity of the inventory
+     * 
+     * @return The maximum number of items the inventory can hold
+     */
     public int getMaxCapacity() {
-        return Integer.MAX_VALUE; // Restituiamo un valore molto alto
+        return Integer.MAX_VALUE; // Return a very high value
     }
 
+    /**
+     * Checks if the inventory is full
+     * 
+     * @return true if the inventory is full, false otherwise
+     */
     public boolean isFull() {
-        return false; // L'inventario non è mai pieno
+        return false; // The inventory is never full
     }
 
+    /**
+     * Checks if the inventory is empty
+     * 
+     * @return true if the inventory is empty, false otherwise
+     */
     public boolean isEmpty() {
         return items.isEmpty();
     }
 
     /**
      * Gets a read-only view of all items
+     * 
+     * @return An unmodifiable list of all items in the inventory
      */
     public List<Item> getAllItems() {
         return Collections.unmodifiableList(items);

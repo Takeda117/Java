@@ -1,11 +1,17 @@
-package factory;
+package java.factory;
 
-import iterator.Item;
-import iterator.Inventory;
+import java.iterator.Item;
+import java.iterator.Inventory;
 import java.util.Random;
 
 /**
  * Mage character class
+ * <p>
+ * This class represents a mage character type in the game.
+ * It extends AbstractCharacter and implements mage-specific
+ * behaviors. Mages have lower health but can use mana for
+ * powerful spell attacks.
+ * </p>
  */
 public class Mage extends AbstractCharacter {
 
@@ -16,6 +22,7 @@ public class Mage extends AbstractCharacter {
 
   /**
    * Creates a new Mage
+   * 
    * @param name The mage's name
    */
   public Mage(String name) {
@@ -26,8 +33,13 @@ public class Mage extends AbstractCharacter {
   }
 
   /**
-   * Mage attack
-   * @return Damage dealt
+   * Performs a mage attack
+   * <p>
+   * Mages can use mana for stronger spell attacks or
+   * perform weaker staff attacks when low on mana.
+   * </p>
+   * 
+   * @return Damage dealt by the attack, or 0 if the attack fails
    */
   @Override
   public int attack() {
@@ -56,7 +68,7 @@ public class Mage extends AbstractCharacter {
   }
 
   /**
-   * Mage training
+   * Implements mage-specific training
    */
   @Override
   protected void performTraining() {
@@ -68,7 +80,7 @@ public class Mage extends AbstractCharacter {
   }
 
   /**
-   * Mage rest
+   * Overrides the rest method to also restore mana
    */
   @Override
   public void rest() {
@@ -78,7 +90,8 @@ public class Mage extends AbstractCharacter {
   }
 
   /**
-   * Equips an item
+   * Equips an item to the mage
+   * 
    * @param item The item to equip
    */
   @Override
@@ -97,7 +110,8 @@ public class Mage extends AbstractCharacter {
   }
 
   /**
-   * Adds an item
+   * Adds an item to the mage's inventory
+   * 
    * @param item The item to add
    */
   @Override
@@ -112,7 +126,7 @@ public class Mage extends AbstractCharacter {
   }
 
   /**
-   * Shows inventory
+   * Shows the mage's inventory
    */
   @Override
   public void showInventory() {
@@ -131,8 +145,9 @@ public class Mage extends AbstractCharacter {
   }
 
   /**
-   * Gets stamina recovery rate
-   * @return Recovery rate
+   * Gets the mage's stamina recovery rate
+   * 
+   * @return The stamina recovery rate as a decimal
    */
   public double getStaminaRecoveryRate() {
     return 0.10;
@@ -140,6 +155,7 @@ public class Mage extends AbstractCharacter {
 
   /**
    * Gets current mana
+   * 
    * @return Current mana amount
    */
   public int getMana() {
@@ -148,6 +164,7 @@ public class Mage extends AbstractCharacter {
 
   /**
    * Gets maximum mana
+   * 
    * @return Maximum mana amount
    */
   public int getMaxMana() {
@@ -155,7 +172,9 @@ public class Mage extends AbstractCharacter {
   }
 
   /**
-   * toString implementation
+   * Returns a string representation of the mage
+   * 
+   * @return A formatted string with the mage's stats
    */
   @Override
   public String toString() {

@@ -1,12 +1,13 @@
-package builder;
+package java.builder;
 
-import combat.CombatSystem;
-import factory.Character;
-import factoryMonster.AbstractMonster;
-import factoryMonster.MonsterFactory;
-import iterator.Item;
-import observer.StaminaRecoverySystem;
-import logger.GameLogger;
+import java.combat.CombatSystem;
+import java.factory.Character;
+import java.factoryMonster.AbstractMonster;
+import java.factoryMonster.MonsterFactory;
+import java.iterator.Item;
+import java.observer.StaminaRecoverySystem;
+import java.logger.GameLogger;
+import java.security.ExceptionHandler;
 import java.util.logging.Logger;
 import java.util.Scanner;
 import java.util.List;
@@ -157,7 +158,7 @@ public class DungeonExplorer {
             return character.isAlive();
         } catch (Exception e) {
             logger.severe("Error during combat: " + e.getMessage());
-            security.ExceptionHandler.handleException(e, "An error occurred during combat.");
+            ExceptionHandler.handleException(e, "An error occurred during combat.");
             return false;
         }
     }

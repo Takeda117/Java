@@ -1,44 +1,59 @@
-package factoryMonster;
+package java.factoryMonster;
 
-import iterator.Item;
-import logger.GameLogger;
+import java.iterator.Item;
+import java.logger.GameLogger;
 import java.util.logging.Logger;
 
 /**
- * Troll - Mostro della Swamp of Trolls
+ * Troll - Monster of the Swamp of Trolls
+ * <p>
+ * This class represents a Troll monster type with specific
+ * stats and behaviors. Trolls are stronger monsters with
+ * high health and damage.
+ * </p>
  */
 public class Troll extends AbstractMonster {
     
     private static final Logger logger = GameLogger.getLogger();
 
     /**
-     * Costruttore per creare un Troll
+     * Constructor for creating a Troll
      */
     public Troll() {
         super(
-                "Troll",        // Nome
-                "Troll",        // Tipo
-                40,             // Vita
-                8,              // Danno
-                20,             // Oro
-                50              // 50% probabilità di drop
+                "Troll",        // Name
+                "Troll",        // Type
+                40,             // Health
+                8,              // Damage
+                20,             // Gold
+                50              // 50% drop chance
         );
 
-        // Aggiunge un possibile drop
-        addPossibleDrop(new Item("Pozione di Cura Grande", Item.ItemType.POTION, 30, 0));
-        addPossibleDrop(new Item("Mazza", Item.ItemType.WEAPON, 50, 3));
-        logger.info("Troll creato con " + health + " HP");
+        // Add possible drops
+        addPossibleDrop(new Item("Large Health Potion", Item.ItemType.POTION, 30, 0));
+        addPossibleDrop(new Item("Club", Item.ItemType.WEAPON, 50, 3));
+        logger.info("Troll created with " + health + " HP");
     }
     
+    /**
+     * Troll attack implementation
+     * 
+     * @return The damage dealt by the attack
+     */
     @Override
     public int attack() {
         int damage = super.attack();
-        logger.info("Troll attacca per " + damage + " danni");
+        logger.info("Troll attacks for " + damage + " damage");
         return damage;
     }
     
+    /**
+     * Returns a string representation of the Troll
+     * 
+     * @return Formatted string with Troll stats
+     */
     @Override
     public String toString() {
-        return "Troll [Vita: " + health + "/" + maxHealth + ", Danno: " + baseDamage + "]";
+        return "Troll [Health: " + health + "/" + maxHealth + ", Damage: " + baseDamage + "]";
     }
 }

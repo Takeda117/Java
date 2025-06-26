@@ -1,15 +1,17 @@
-package composite;
+package java.composite;
 
-import security.InputValidator;
+import java.security.InputValidator;
 import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
 
 /**
  * GameMenu - Composite pattern implementation for game menus
- *
+ * <p>
  * This class can contain both menu items and submenus,
- * creating a tree structure of menus
+ * creating a tree structure of menus. It serves as the composite
+ * node in the Composite pattern, allowing a hierarchical menu system.
+ * </p>
  */
 public class GameMenu implements MenuComponent {
 
@@ -19,6 +21,8 @@ public class GameMenu implements MenuComponent {
 
     /**
      * Constructor for creating a menu
+     * 
+     * @param title The title of the menu
      */
     public GameMenu(String title) {
         this.title = title;
@@ -27,7 +31,9 @@ public class GameMenu implements MenuComponent {
     }
 
     /**
-     * Add a menu item or submenu
+     * Adds a menu item or submenu to this menu
+     * 
+     * @param component The menu component to add
      */
     @Override
     public void add(MenuComponent component) {
@@ -35,7 +41,9 @@ public class GameMenu implements MenuComponent {
     }
 
     /**
-     * Remove a menu item
+     * Removes a menu item or submenu from this menu
+     * 
+     * @param component The menu component to remove
      */
     @Override
     public void remove(MenuComponent component) {
@@ -43,7 +51,11 @@ public class GameMenu implements MenuComponent {
     }
 
     /**
-     * Display and execute the menu
+     * Displays and executes the menu
+     * <p>
+     * This method shows the menu options, handles user input,
+     * and executes the selected menu item or submenu.
+     * </p>
      */
     @Override
     public void execute() {
@@ -57,10 +69,10 @@ public class GameMenu implements MenuComponent {
             System.out.print("\nYour choice: ");
             String input = scanner.nextLine();
 
-            // Determina il numero massimo di opzioni
+            // Determine the maximum number of options
             int maxOptions = menuItems.size();
 
-            // Controlla se questo menu ha l'opzione 0 visibile
+            // Check if this menu has a visible zero option
             boolean hasZeroOption = !(title.contains("Menu Personaggio") || 
                                      title.contains("Esplora Dungeon") || 
                                      title.contains("Inventario"));
@@ -80,7 +92,7 @@ public class GameMenu implements MenuComponent {
                 MenuComponent selected = menuItems.get(choice - 1);
                 selected.execute();
 
-                // Se l'ultima opzione è "Torna al..." e l'utente l'ha selezionata, esci dal menu
+                // If the last option is "Return to..." and the user selected it, exit the menu
                 if (choice == menuItems.size() && 
                     selected.getName() != null && 
                     (selected.getName().contains("Torna al") || 
@@ -98,7 +110,11 @@ public class GameMenu implements MenuComponent {
     }
 
     /**
-     * Display the menu options
+     * Displays the menu options
+     * <p>
+     * This method shows the menu title and all available options,
+     * including a back/exit option appropriate to the menu type.
+     * </p>
      */
     @Override
     public void display() {
@@ -109,20 +125,22 @@ public class GameMenu implements MenuComponent {
             menuItems.get(i).display();
         }
 
-        // Mostra l'opzione di uscita appropriata in base al tipo di menu
+        // Show the appropriate exit option based on the menu type
         if (title.contains("Menu Principale") || title.equals("RPG Adventure Game - Menu Principale")) {
             System.out.println("0. Exit");
         } else if (title.contains("Menu Personaggio") || 
                    title.contains("Esplora Dungeon") || 
                    title.contains("Inventario")) {
-            // Non mostrare l'opzione 0 per questi menu, dato che hanno già opzioni per tornare al menu precedente
+            // Don't show the 0 option for these menus, as they already have options to return to the previous menu
         } else {
-            System.out.println("0. Indietro");
+            System.out.println("0. Back");
         }
     }
 
     /**
-     * Get the menu title
+     * Gets the menu title
+     * 
+     * @return The title of the menu
      */
     @Override
     public String getName() {

@@ -1,16 +1,16 @@
-package menu;
+package java.menu;
 
 import composite.*;
-import factory.Character;
-import factory.Warrior;
-import factory.Mage;
-import iterator.Item;
-import iterator.Inventory;
-import strategy.SortByNameStrategy;
-import strategy.SortByTypeStrategy;
-import strategy.SortByValueStrategy;
-import strategy.InventorySortStrategy;
-import logger.GameLogger;
+import java.factory.Character;
+import java.factory.Warrior;
+import java.factory.Mage;
+import java.iterator.Item;
+import java.iterator.Inventory;
+import java.strategy.SortByNameStrategy;
+import java.strategy.SortByTypeStrategy;
+import java.strategy.SortByValueStrategy;
+import java.strategy.InventorySortStrategy;
+import java.logger.GameLogger;
 
 import java.util.List;
 import java.util.Map;
@@ -19,13 +19,30 @@ import java.util.logging.Logger;
 
 /**
  * InventoryMenu - Manages inventory display with sorting strategies
- * Implements Strategy Pattern for inventory sorting
+ * <p>
+ * This class is responsible for building and executing the inventory menu
+ * for a specific character. It provides options for viewing items with
+ * different sorting strategies, implementing the Strategy pattern for
+ * inventory sorting. The class uses the Composite pattern through the
+ * GameMenu and MenuItem classes to structure the menu hierarchy.
+ * </p>
+ * <p>
+ * The InventoryMenu integrates with the Inventory class to display and
+ * manage the character's items, and uses reflection to access the
+ * character's inventory when direct access is not available.
+ * </p>
  */
 public class InventoryMenu {
     private static final Logger logger = GameLogger.getLogger();
 
     /**
      * Shows inventory menu
+     * <p>
+     * Displays and executes the inventory menu for a specific character,
+     * providing options for viewing items with different sorting strategies.
+     * </p>
+     * 
+     * @param character The character whose inventory to display
      */
     public static void showInventoryMenu(Character character) {
         if (character == null) {
@@ -49,7 +66,15 @@ public class InventoryMenu {
 
     /**
      * Shows items using the specified sorting strategy
-     * Core method implementing the Strategy pattern
+     * <p>
+     * Core method implementing the Strategy pattern for inventory sorting.
+     * Retrieves the character's inventory, applies the specified sorting
+     * strategy, and displays the items accordingly.
+     * </p>
+     * 
+     * @param character The character whose items to display
+     * @param strategy The sorting strategy to apply, or null for default sorting
+     * @param title The title to display for the item list
      */
     private static void showItems(Character character, InventorySortStrategy strategy, String title) {
         System.out.println("\n=== " + title + " ===");
@@ -83,6 +108,13 @@ public class InventoryMenu {
 
     /**
      * Displays items grouped by type
+     * <p>
+     * Shows items organized by their type categories, with additional
+     * information about each item.
+     * </p>
+     * 
+     * @param items The list of items to display
+     * @param inventory The inventory containing the items
      */
     private static void displayItemsByType(List<Item> items, Inventory inventory) {
         Map<Item.ItemType, List<Item>> itemsByType = items.stream()
@@ -105,6 +137,13 @@ public class InventoryMenu {
 
     /**
      * Displays items in a formatted list
+     * <p>
+     * Shows items in a simple numbered list format, with information
+     * about each item.
+     * </p>
+     * 
+     * @param items The list of items to display
+     * @param inventory The inventory containing the items
      */
     private static void displayItems(List<Item> items, Inventory inventory) {
         System.out.println("Oggetti nell'inventario: " + items.size());
@@ -120,6 +159,13 @@ public class InventoryMenu {
 
     /**
      * Gets character inventory using reflection
+     * <p>
+     * Uses reflection to access the character's inventory field, which
+     * may not be directly accessible due to encapsulation.
+     * </p>
+     * 
+     * @param character The character whose inventory to retrieve
+     * @return The character's inventory, or null if it cannot be accessed
      */
     private static Inventory getCharacterInventory(Character character) {
         try {

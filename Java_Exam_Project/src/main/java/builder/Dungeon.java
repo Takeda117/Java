@@ -1,7 +1,7 @@
 
-package builder;
+package java.builder;
 
-import logger.GameLogger;
+import java.logger.GameLogger;
 import java.util.logging.Logger;
 
 /**
