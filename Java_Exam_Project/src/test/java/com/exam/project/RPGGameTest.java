@@ -1,11 +1,11 @@
 package com.exam.project;
 
-import com.exam.project.factory.Character;
-import com.exam.project.factory.CharacterFactory;
-import com.exam.project.factory.Warrior;
-import com.exam.project.iterator.*;
-import com.exam.project.builder.*;
-import com.exam.project.logger.GameLogger;
+import factory.Character;
+import factory.CharacterFactory;
+import factory.Warrior;
+import iterator.*;
+import builder.*;
+import logger.GameLogger;
 import org.junit.Test;
 import org.junit.Before;
 import static org.junit.Assert.*;
