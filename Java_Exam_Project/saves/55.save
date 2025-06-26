@@ -1,0 +1,11 @@
+#Character Save
+#Thu Jun 26 00:04:17 CEST 2025
+damage=15
+health=120
+level=1
+maxHealth=120
+maxStamina=100
+money=100
+name=AA
+stamina=100
+type=Warrior
