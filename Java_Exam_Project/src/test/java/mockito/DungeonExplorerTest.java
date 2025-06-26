@@ -1,11 +1,11 @@
 package mockito;
 
-import java.builder.Dungeon;
-import java.builder.DungeonExplorer;
-import java.combat.CombatSystem;
-import java.factory.Character;
-import java.factoryMonster.AbstractMonster;
-import java.factoryMonster.MonsterFactory;
+import rpg.builder.Dungeon;
+import rpg.builder.DungeonExplorer;
+import rpg.combat.CombatSystem;
+import rpg.factory.Character;
+import rpg.factoryMonster.AbstractMonster;
+import rpg.factoryMonster.MonsterFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

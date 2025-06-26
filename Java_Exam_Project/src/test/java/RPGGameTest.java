@@ -1,13 +1,13 @@
-import java.builder.ConcreteDungeonBuilder;
-import java.builder.Dungeon;
-import java.builder.DungeonBuilder;
-import java.factory.Character;
-import java.factory.CharacterFactory;
-import java.factory.Warrior;
+import rpg.builder.ConcreteDungeonBuilder;
+import rpg.builder.Dungeon;
+import rpg.builder.DungeonBuilder;
+import rpg.factory.Character;
+import rpg.factory.CharacterFactory;
+import rpg.factory.Warrior;
 
-import java.iterator.Inventory;
-import java.iterator.Item;
-import java.logger.GameLogger;
+import rpg.iterator.Inventory;
+import rpg.iterator.Item;
+import rpg.logger.GameLogger;
 import org.junit.Test;
 import org.junit.Before;
 import static org.junit.Assert.*;

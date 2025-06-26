@@ -1,10 +1,10 @@
 package mockito;
 
-import java.factory.CharacterFactory;
-import java.factory.Character;
-import java.factory.Warrior;
-import java.factory.Mage;
-import java.rpgSecurity.InputValidator;
+import rpg.factory.CharacterFactory;
+import rpg.factory.Character;
+import rpg.factory.Warrior;
+import rpg.factory.Mage;
+import rpg.rpgSecurity.InputValidator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,9 +38,7 @@ import static org.junit.Assert.*;
 public class CharacterFactoryTest {
 
     private CharacterFactory factory;
-    
-    @Mock
-    private InputValidator mockValidator;
+
 
     /**
      * Sets up the test environment before each test

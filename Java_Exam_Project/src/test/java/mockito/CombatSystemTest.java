@@ -1,8 +1,8 @@
 package mockito;
 
-import java.combat.CombatSystem;
-import java.factory.Character;
-import java.factoryMonster.AbstractMonster;
+import rpg.combat.CombatSystem;
+import rpg.factory.Character;
+import rpg.factoryMonster.AbstractMonster;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

@@ -31,7 +31,12 @@
   </dependencies>
 
   <build>
+    <!-- Explicitly set source directory to src/main -->
+    <sourceDirectory>src/main</sourceDirectory>
+    <testSourceDirectory>src/test/java</testSourceDirectory>
+    
     <plugins>
+      <!-- Compiler plugin with Java 24 settings -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -43,18 +48,13 @@
         </configuration>
       </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.2.5</version>
-      </plugin>
-
+      <!-- Exec plugin for running the application -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>3.1.0</version>
         <configuration>
-          <mainClass>App</mainClass>
+          <mainClass>rpg.App</mainClass>
         </configuration>
       </plugin>
     </plugins>
