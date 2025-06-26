@@ -12,7 +12,12 @@ import java.util.Scanner;
 import java.util.List;
 
 /**
- * DungeonExplorer - Gestisce l'esplorazione di un dungeon
+ * DungeonExplorer - Manages the exploration of a dungeon
+ * <p>
+ * This class uses a fluent interface (a variation of the Builder pattern) to configure
+ * and execute a dungeon exploration. It handles the combat between the character and
+ * monsters found in the dungeon.
+ * </p>
  */
 public class DungeonExplorer {
     
@@ -20,12 +25,12 @@ public class DungeonExplorer {
     
     private Character character;
     private Dungeon dungeon;
-    private final Scanner  scanner;
+    private final Scanner scanner;
     private final CombatSystem combatSystem;
     private final MonsterFactory monsterFactory;
     
     /**
-     * Costruttore
+     * Constructor that initializes the explorer with required components
      */
     public DungeonExplorer() {
         this.scanner = new Scanner(System.in);
@@ -34,7 +39,10 @@ public class DungeonExplorer {
     }
     
     /**
-     * Imposta il personaggio
+     * Sets the character that will explore the dungeon
+     * 
+     * @param character The character to use for exploration
+     * @return The explorer instance for method chaining
      */
     public DungeonExplorer withCharacter(Character character) {
         this.character = character;
@@ -42,7 +50,10 @@ public class DungeonExplorer {
     }
     
     /**
-     * Imposta il dungeon
+     * Sets the dungeon to be explored
+     * 
+     * @param dungeon The dungeon to explore
+     * @return The explorer instance for method chaining
      */
     public DungeonExplorer withDungeon(Dungeon dungeon) {
         this.dungeon = dungeon;
@@ -50,30 +61,38 @@ public class DungeonExplorer {
     }
     
     /**
-     * Avvia l'esplorazione
+     * Starts the dungeon exploration
+     * <p>
+     * This method creates a monster based on the dungeon's monster type,
+     * initiates combat, and handles rewards if the character is victorious.
+     * </p>
+     * 
+     * @return true if the exploration was successful (character survived), false otherwise
      */
     public boolean build() {
         if (character == null || dungeon == null) {
+            logger.warning("Cannot explore dungeon: character or dungeon is null");
             return false;
         }
         
-        logger.info(character.getName() + " esplora " + dungeon.getName());
-        System.out.println("\nStai esplorando " + dungeon.getName());
+        logger.info(character.getName() + " explores " + dungeon.getName());
+        System.out.println("\nYou are exploring " + dungeon.getName());
         System.out.println(dungeon.getDescription());
         
-        // Crea un mostro
+        // Create a monster
         AbstractMonster monster = monsterFactory.createMonster(dungeon.getMonsterType());
         if (monster == null) {
-            System.out.println("Non ci sono mostri qui.");
+            logger.warning("No monster created for type: " + dungeon.getMonsterType());
+            System.out.println("There are no monsters here.");
             return false;
         }
         
-        System.out.println("\nHai incontrato un " + monster.getType() + "!");
+        System.out.println("\nYou encountered a " + monster.getType() + "!");
         
-        // Combatti
+        // Fight
         boolean victory = combat(monster);
         
-        // Recupera stamina dopo il dungeon
+        // Recover stamina after the dungeon
         if (victory) {
             StaminaRecoverySystem.recoverStamina(character);
         }
@@ -82,49 +101,64 @@ public class DungeonExplorer {
     }
     
     /**
-     * Sistema di combattimento
+     * Handles the combat system between the character and a monster
+     * <p>
+     * This method manages the turn-based combat, allowing the player to attack
+     * and handling the monster's counterattacks until one of them is defeated.
+     * </p>
+     * 
+     * @param monster The monster to fight against
+     * @return true if the character won the combat, false otherwise
      */
     private boolean combat(AbstractMonster monster) {
-        while (monster.isAlive() && character.isAlive()) {
-            // Mostra stato
-            System.out.println("\nHP: " + character.getHealth() + "/" + character.getMaxHealth());
-            System.out.println("Nemico: " + monster.getHealth() + " HP");
-            
-            // Turno del giocatore
-            System.out.println("\n1. Attacca");
-            System.out.print("Cosa fai? ");
-            scanner.nextLine();
-            
-            combatSystem.executeAttack(character, monster);
-            
-            // Controlla se il mostro è morto
-            if (!monster.isAlive()) {
-                System.out.println("\nHai vinto!");
-                System.out.println("Hai guadagnato " + dungeon.getGoldReward() + " oro!");
+        try {
+            while (monster.isAlive() && character.isAlive()) {
+                // Show status
+                System.out.println("\nHP: " + character.getHealth() + "/" + character.getMaxHealth());
+                System.out.println("Enemy: " + monster.getHealth() + " HP");
                 
-                // Aggiungi gli oggetti droppati all'inventario del personaggio
-                List<Item> droppedItems = monster.getDroppedItems();
-                if (!droppedItems.isEmpty()) {
-                    System.out.println("\nHai trovato:");
-                    for (Item item : droppedItems) {
-                        character.addItem(item);
-                        // Il messaggio di conferma viene già mostrato nel metodo addItem
+                // Player's turn
+                System.out.println("\n1. Attack");
+                System.out.print("What do you do? ");
+                scanner.nextLine();
+                
+                combatSystem.executeAttack(character, monster);
+                
+                // Check if the monster is dead
+                if (!monster.isAlive()) {
+                    logger.info(character.getName() + " defeated " + monster.getType());
+                    System.out.println("\nYou won!");
+                    System.out.println("You earned " + dungeon.getGoldReward() + " gold!");
+                    
+                    // Add dropped items to the character's inventory
+                    List<Item> droppedItems = monster.getDroppedItems();
+                    if (!droppedItems.isEmpty()) {
+                        System.out.println("\nYou found:");
+                        for (Item item : droppedItems) {
+                            character.addItem(item);
+                            // Confirmation message is already shown in the addItem method
+                        }
                     }
+                    
+                    return true;
                 }
                 
-                return true;
+                // Monster's turn
+                combatSystem.executeMonsterAttack(monster, character);
+                
+                // Check if the character is dead
+                if (!character.isAlive()) {
+                    logger.info(character.getName() + " was defeated by " + monster.getType());
+                    System.out.println("\nYou have been defeated!");
+                    return false;
+                }
             }
             
-            // Turno del mostro
-            combatSystem.executeMonsterAttack(monster, character);
-            
-            // Controlla se il personaggio è morto
-            if (!character.isAlive()) {
-                System.out.println("\nSei stato sconfitto!");
-                return false;
-            }
+            return character.isAlive();
+        } catch (Exception e) {
+            logger.severe("Error during combat: " + e.getMessage());
+            security.ExceptionHandler.handleException(e, "An error occurred during combat.");
+            return false;
         }
-        
-        return character.isAlive();
     }
 }

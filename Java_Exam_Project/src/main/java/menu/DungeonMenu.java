@@ -40,7 +40,7 @@ public class DungeonMenu {
             throw e;
         } catch (Exception e) {
             logger.severe("Errore nel menu dungeon: " + e.getMessage());
-            System.out.println("Errore nel menu dungeon.");
+            security.ExceptionHandler.handleException(e, "Errore nel menu dungeon.");
         }
     }
     

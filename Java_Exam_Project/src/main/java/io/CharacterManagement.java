@@ -89,13 +89,17 @@ public class CharacterManagement {
                 logger.info("Character saved successfully: " + character.getName() + " to " + saveFile.getAbsolutePath());
                 System.out.println("Character saved to " + saveFile.getAbsolutePath());
                 return true;
+            } catch (IOException e) {
+                logger.severe("File write error: " + e.getMessage());
+                ExceptionHandler.handleSaveLoadError(e);
+                return false;
+            } catch (Exception e) {
+                logger.severe("Unexpected error during save: " + e.getMessage());
+                ExceptionHandler.handleException(e, "Save failed!");
+                return false;
             }
-        } catch (IOException e) {
-            logger.severe("File write error: " + e.getMessage());
-            ExceptionHandler.handleSaveLoadError(e);
-            return false;
         } catch (Exception e) {
-            logger.severe("Unexpected error during save: " + e.getMessage());
+            logger.severe("Unexpected error preparing save: " + e.getMessage());
             ExceptionHandler.handleException(e, "Save failed!");
             return false;
         }
@@ -136,11 +140,11 @@ public class CharacterManagement {
             logger.info("File loaded successfully: " + safeFilename);
         } catch (FileNotFoundException e) {
             logger.warning("Save file not found: " + safeFilename);
-            System.out.println("Save file not found!");
+            ExceptionHandler.handleSaveLoadError(e);
             return null;
         } catch (IOException e) {
             logger.severe("File read error: " + e.getMessage());
-            System.out.println("Load failed!");
+            ExceptionHandler.handleSaveLoadError(e);
             return null;
         }
 

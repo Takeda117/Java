@@ -1,5 +1,6 @@
 package factory;
 
+import security.ExceptionHandler;
 import security.InputValidator;
 import java.util.logging.Logger;
 
@@ -48,7 +49,7 @@ public class CharacterFactory {
             }
         } catch (Exception e) {
             logger.severe("Error creating character: " + e.getMessage());
-            System.out.println("Error creating character: " + e.getMessage());
+            ExceptionHandler.handleCharacterError(e);
             return null;
         }
     }

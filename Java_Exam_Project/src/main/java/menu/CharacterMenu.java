@@ -38,7 +38,7 @@ public class CharacterMenu {
             throw e;
         } catch (Exception e) {
             logger.severe("Error in character menu: " + e.getMessage());
-            System.out.println("Errore nel menu personaggio.");
+            security.ExceptionHandler.handleException(e, "Errore nel menu personaggio.");
         }
     }
 

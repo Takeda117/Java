@@ -1,37 +1,57 @@
 package builder;
 
 /**
- * DungeonBuilder - Interfaccia per il Builder Pattern
+ * DungeonBuilder - Interface for the Builder Pattern implementation
+ * <p>
+ * This interface defines the contract for creating dungeons using the Builder pattern.
+ * It provides methods to set various attributes of a dungeon and finally build it.
+ * </p>
  */
 public interface DungeonBuilder {
     
     /**
-     * Resetta il builder
+     * Resets the builder to its default state
+     * 
+     * @return The builder instance for method chaining
      */
     DungeonBuilder reset();
     
     /**
-     * Imposta il nome del dungeon
+     * Sets the name of the dungeon
+     * 
+     * @param name The name to set for the dungeon
+     * @return The builder instance for method chaining
      */
     DungeonBuilder setName(String name);
     
     /**
-     * Imposta la descrizione del dungeon
+     * Sets the description of the dungeon
+     * 
+     * @param description The description to set for the dungeon
+     * @return The builder instance for method chaining
      */
     DungeonBuilder setDescription(String description);
     
     /**
-     * Imposta la ricompensa in oro del dungeon
+     * Sets the gold reward for completing the dungeon
+     * 
+     * @param goldReward The amount of gold to reward
+     * @return The builder instance for method chaining
      */
     DungeonBuilder setGoldReward(int goldReward);
     
     /**
-     * Imposta il tipo di mostro del dungeon
+     * Sets the type of monster that inhabits the dungeon
+     * 
+     * @param monsterType The type of monster to set
+     * @return The builder instance for method chaining
      */
     DungeonBuilder setMonsterType(String monsterType);
     
     /**
-     * Costruisce e restituisce il dungeon
+     * Builds and returns a new Dungeon instance with the configured properties
+     * 
+     * @return A new Dungeon instance
      */
     Dungeon build();
 }

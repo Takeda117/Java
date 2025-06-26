@@ -19,21 +19,27 @@ public class MonsterFactory {
             return null;
         }
 
-        AbstractMonster monster = switch (type.toLowerCase()) {
-            case "goblin" -> {
-                logger.info("Creazione Goblin");
-                yield new Goblin();
-            }
-            case "troll" -> {
-                logger.info("Creazione Troll");
-                yield new Troll();
-            }
-            default -> {
-                logger.warning("Tipo di mostro sconosciuto: " + type + ", creazione Goblin di default");
-                yield new Goblin();
-            }
-        };
+        try {
+            AbstractMonster monster = switch (type.toLowerCase()) {
+                case "goblin" -> {
+                    logger.info("Creazione Goblin");
+                    yield new Goblin();
+                }
+                case "troll" -> {
+                    logger.info("Creazione Troll");
+                    yield new Troll();
+                }
+                default -> {
+                    logger.warning("Tipo di mostro sconosciuto: " + type + ", creazione Goblin di default");
+                    yield new Goblin();
+                }
+            };
 
-        return monster;
+            return monster;
+        } catch (Exception e) {
+            logger.severe("Errore nella creazione del mostro: " + e.getMessage());
+            security.ExceptionHandler.handleException(e, "Errore nella creazione del mostro.");
+            return null;
+        }
     }
 }
