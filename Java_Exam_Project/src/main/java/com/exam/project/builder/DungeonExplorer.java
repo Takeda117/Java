@@ -104,7 +104,8 @@ public class DungeonExplorer {
             System.out.println("Your character: " + character);
 
             System.out.print("\nEnter this dungeon? (y/n): ");
-            if (!InputValidator.validateYesNo(scanner.nextLine())) {
+            String confirmInput = scanner.nextLine();
+            if (!InputValidator.validateYesNo(confirmInput)) {
                 logger.info("Player cancelled dungeon exploration");
                 System.out.println("Maybe next time...");
                 return false;
@@ -196,13 +197,16 @@ public class DungeonExplorer {
                 String input;
                 try {
                     input = scanner.nextLine();
+                    logger.fine("Combat input received: " + input);
                 } catch (Exception e) {
+                    logger.warning("Error reading combat input: " + e.getMessage() + ". Using default '1'");
                     input = "1";
                 }
 
                 Integer choice = InputValidator.validateMenuChoice(input, enableFlee ? 2 : 1);
 
                 if (choice == null) {
+                    logger.warning("Invalid combat choice: " + input);
                     System.out.println("Invalid choice!");
                     continue;
                 }
@@ -210,11 +214,13 @@ public class DungeonExplorer {
                 if (choice == 1) {
                     // Attack
                     if (!combatSystem.canFight(character)) {
+                        logger.info("Character too tired to fight: " + character.getName());
                         System.out.println("You're too tired to fight!");
                         continue;
                     }
 
                     AbstractMonster target = monsters.get(0);
+                    logger.info("Character attacking: " + character.getName() + " -> " + target.getType() + " " + target.getName());
                     int damage = combatSystem.executeAttack(character, target);
 
                     if (damage > 0) {
@@ -222,6 +228,7 @@ public class DungeonExplorer {
                     }
                 } else if (choice == 2 && enableFlee) {
                     // Try to flee
+                    logger.info("Character attempting to flee: " + character.getName());
                     if (random.nextInt(100) < 50) {
                         logger.info("Flee attempt successful");
                         System.out.println("You escape!");
@@ -264,9 +271,11 @@ public class DungeonExplorer {
                 }
             }
 
-            return character.isAlive();
+            boolean result = character.isAlive();
+            logger.info("Combat ended. Character survived: " + result);
+            return result;
         } catch (Exception e) {
-            logger.severe("Critical error during combat: " + e.getMessage());
+            logger.severe("Critical error during combat: " + e.getMessage(), e);
             System.out.println("Combat error occurred!");
             return false;
         }

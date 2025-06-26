@@ -4,6 +4,8 @@ import com.exam.project.iterator.Item;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
+import com.exam.project.logger.GameLogger;
+import java.util.logging.Logger;
 
 /**
  * AbstractMonster - Classe base per tutti i mostri del gioco
@@ -15,6 +17,8 @@ import java.util.Random;
  * dato che i mostri non hanno inventari complessi o progressione.
  */
 public abstract class AbstractMonster {
+
+    private static final Logger logger = GameLogger.getLogger();
 
     // Statistiche base comuni a tutti i mostri
     protected String name;
@@ -98,16 +102,21 @@ public abstract class AbstractMonster {
      */
     public void takeDamage(int damage) {
         if (damage < 0) {
+            logger.warning("Invalid negative damage attempted: " + damage + " on " + type + " " + name);
             System.out.println("Danno non valido ignorato");
             return;
         }
 
+        int oldHealth = this.health;
         this.health = Math.max(0, this.health - damage);
+        
+        logger.info(type + " " + name + " took " + damage + " damage. Health: " + oldHealth + " -> " + health);
 
         System.out.printf("%s %s subisce %d danni! Vita: %d/%d%n",
                 type, name, damage, health, maxHealth);
 
         if (!isAlive()) {
+            logger.info(type + " " + name + " was defeated");
             System.out.printf("%s %s è stato sconfitto!%n", type, name);
             onDefeat(); // Chiamata al metodo di sconfitta
         }

@@ -56,18 +56,19 @@ public class GameMenu implements MenuComponent {
             // Get user choice
             System.out.print("\nYour choice: ");
             String input = scanner.nextLine();
-            
+
             // Determina il numero massimo di opzioni
             int maxOptions = menuItems.size();
-            
+
             // Controlla se questo menu ha l'opzione 0 visibile
             boolean hasZeroOption = !(title.contains("Menu Personaggio") || 
                                      title.contains("Esplora Dungeon") || 
                                      title.contains("Inventario"));
-            
+
             Integer choice = InputValidator.validateMenuChoice(input, maxOptions);
 
             if (choice == null) {
+                System.out.println("Invalid choice! Please try again.");
                 continue;
             }
 

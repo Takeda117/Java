@@ -1,6 +1,9 @@
 package com.exam.project.factory;
 
+import com.exam.project.security.InputValidator;
+
 import java.lang.reflect.Field;
+import java.util.logging.Logger;
 
 /**
  * Factory for creating character objects
@@ -8,31 +11,41 @@ import java.lang.reflect.Field;
  */
 public class CharacterFactory {
 
+    private static final Logger logger = Logger.getLogger(CharacterFactory.class.getName());
+
     /**
      * Create a character based on type
-     * @param characterType Type of character to create
-     * @param name Name of the character
-     * @return A new character instance
      */
-    public Character createCharacter(String characterType, String name) {
-        if (characterType == null || name == null) {
+    public Character createCharacter(String type, String name) {
+        logger.info("Creating character of type: " + type + " with name: " + name);
+        
+        // Validate name
+        String validatedName = InputValidator.validateCharacterName(name);
+        if (validatedName == null) {
+            logger.warning("Character creation failed: invalid name");
             return null;
         }
-
-        // Clean the inputs
-        String safeInputName = name.trim();
-        String safeInputType = characterType.toLowerCase().trim();
-
-        // Create the right character type
-        switch (safeInputType) {
-            case "warrior", "w":
-                return new Warrior(safeInputName);
-
-            case "mage", "m":
-                return new Mage(safeInputName);
-
-            default:
-                return null;
+        
+        // Sanitize and validate type
+        String sanitizedType = InputValidator.sanitizeInput(type);
+        if (sanitizedType.isEmpty()) {
+            logger.warning("Character creation failed: empty type");
+            System.out.println("Character type cannot be empty!");
+            return null;
+        }
+        
+        // Convert to lowercase for case-insensitive comparison
+        sanitizedType = sanitizedType.toLowerCase();
+        
+        // Create character based on type
+        if (sanitizedType.equals("warrior")) {
+            return new Warrior(validatedName);
+        } else if (sanitizedType.equals("mage")) {
+            return new Mage(validatedName);
+        } else {
+            logger.warning("Character creation failed: invalid type: " + sanitizedType);
+            System.out.println("Invalid character type!");
+            return null;
         }
     }
 

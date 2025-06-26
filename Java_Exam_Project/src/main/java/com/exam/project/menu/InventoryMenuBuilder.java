@@ -6,9 +6,11 @@ import com.exam.project.factory.Warrior;
 import com.exam.project.factory.Mage;
 import com.exam.project.iterator.Item;
 import com.exam.project.iterator.Inventory;
+import com.exam.project.strategy.SortByNameStrategy;
 import com.exam.project.strategy.SortByTypeStrategy;
 import com.exam.project.security.InputValidator;
 import com.exam.project.logger.GameLogger;
+import com.exam.project.strategy.SortByValueStrategy;
 
 import java.util.Scanner;
 import java.util.List;
@@ -36,7 +38,7 @@ public class InventoryMenuBuilder {
 
         try {
             GameMenu inventoryMenu = buildInventoryMenu(character);
-            inventoryMenu.execute();
+            inventoryMenu.execute(); // This already uses InputValidator internally
         } catch (Exception e) {
             logger.severe("Error in inventory menu: " + e.getMessage());
             System.out.println("Errore nel menu inventario.");
@@ -51,6 +53,8 @@ public class InventoryMenuBuilder {
 
         menu.add(new MenuItem("Mostra tutti gli oggetti", () -> showAllItems(character)));
         menu.add(new MenuItem("Mostra oggetti per tipologia", () -> showItemsByType(character)));
+        menu.add(new MenuItem("Mostra oggetti per valore", () -> showItemsByValue(character)));
+        menu.add(new MenuItem("Mostra oggetti per nome", () -> showItemsByName(character)));
         menu.add(new MenuItem("Torna al menu personaggio", () -> {
             // Simply exit this menu
         }));
@@ -67,7 +71,7 @@ public class InventoryMenuBuilder {
 
             Inventory inventory = getCharacterInventory(character);
             if (inventory == null) {
-                System.out.println("Errore nell'accesso all'inventario!");
+                System.out.println("Errore nell'accesso all’inventario!");
                 return;
             }
 
@@ -77,6 +81,9 @@ public class InventoryMenuBuilder {
                 System.out.println("L'inventario è vuoto.");
                 return;
             }
+
+            // No specific sorting strategy - items will be shown in their natural order
+            inventory.setSortStrategy(null);
 
             System.out.println("Oggetti nell'inventario (" + allItems.size() + "/" + inventory.getMaxCapacity() + "):");
 
@@ -147,6 +154,90 @@ public class InventoryMenuBuilder {
         } catch (Exception e) {
             logger.warning("Error showing items by type: " + e.getMessage());
             System.out.println("Errore nella visualizzazione per tipologia.");
+        }
+    }
+
+    /**
+     * Show items sorted by value (highest to lowest)
+     */
+    private static void showItemsByValue(Character character) {
+        try {
+            System.out.println("\n=== OGGETTI PER VALORE ===");
+
+            Inventory inventory = getCharacterInventory(character);
+            if (inventory == null) {
+                System.out.println("Errore nell'accesso all’inventario!");
+                return;
+            }
+
+            List<Item> allItems = inventory.getAllItems();
+
+            if (allItems.isEmpty()) {
+                System.out.println("L'inventario è vuoto.");
+                return;
+            }
+
+            // Use Strategy Pattern to sort by value
+            inventory.setSortStrategy(new SortByValueStrategy());
+            inventory.sort();
+
+            System.out.println("Oggetti ordinati per valore (dal più costoso):");
+            
+            int index = 1;
+            for (Item item : allItems) {
+                System.out.printf("%d. %s [%s] - Valore: %d oro%n",
+                        index++, item.getName(), item.getType().getDisplayName(), item.getValue());
+            }
+
+            System.out.println("\nValore totale: " + inventory.getTotalValue() + " oro");
+
+            logger.info("Displayed items by value for: " + character.getName());
+
+        } catch (Exception e) {
+            logger.warning("Error showing items by value: " + e.getMessage());
+            System.out.println("Errore nella visualizzazione per valore.");
+        }
+    }
+
+    /**
+     * Show items sorted alphabetically by name
+     */
+    private static void showItemsByName(Character character) {
+        try {
+            System.out.println("\n=== OGGETTI PER NOME ===");
+
+            Inventory inventory = getCharacterInventory(character);
+            if (inventory == null) {
+                System.out.println("Errore nell'accesso all’inventario!");
+                return;
+            }
+
+            List<Item> allItems = inventory.getAllItems();
+
+            if (allItems.isEmpty()) {
+                System.out.println("L'inventario è vuoto.");
+                return;
+            }
+
+            // Use Strategy Pattern to sort by name
+            inventory.setSortStrategy(new  SortByNameStrategy());
+            inventory.sort();
+
+            System.out.println("Oggetti ordinati alfabeticamente:");
+            
+            int index = 1;
+            for (Item item : allItems) {
+                System.out.printf("%d. %s [%s] - Valore: %d oro%n",
+                        index++, item.getName(), item.getType().getDisplayName(), item.getValue());
+            }
+
+            System.out.println("\nValore totale: " + inventory.getTotalValue() + " oro");
+
+            logger.info("Displayed items by name for: " + character.getName());
+
+        } catch (Exception e) {
+            logger.warning("Error showing items by name: " + e.getMessage());
+            System.out.println("Errore nella visualizzazione per nome.");
         }
     }
 
