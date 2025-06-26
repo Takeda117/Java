@@ -4,7 +4,7 @@ import java.factory.CharacterFactory;
 import java.factory.Character;
 import java.factory.Warrior;
 import java.factory.Mage;
-import java.security.InputValidator;
+import java.rpgSecurity.InputValidator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

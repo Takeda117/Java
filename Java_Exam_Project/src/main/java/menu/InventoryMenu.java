@@ -1,6 +1,8 @@
 package java.menu;
 
-import composite.*;
+
+import java.composite.GameMenu;
+import java.composite.MenuItem;
 import java.factory.Character;
 import java.factory.Warrior;
 import java.factory.Mage;

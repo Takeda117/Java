@@ -1,4 +1,4 @@
-package java.security;
+package java.rpgSecurity;
 
 import java.logger.GameLogger;
 import java.util.logging.Level;

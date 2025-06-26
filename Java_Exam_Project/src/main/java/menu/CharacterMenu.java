@@ -1,12 +1,13 @@
 package java.menu;
 
-import composite.*;
+import java.composite.GameMenu;
+import java.composite.MenuItem;
 import java.factory.Character;
-import java.io.CharacterManagement;
-import java.security.InputValidator;
+import java.rpgIO.CharacterManagement;
+import java.rpgSecurity.InputValidator;
 import java.logger.GameLogger;
 
-import java.security.ExceptionHandler;
+import java.rpgSecurity.ExceptionHandler;
 import java.util.Scanner;
 import java.util.logging.Logger;
 

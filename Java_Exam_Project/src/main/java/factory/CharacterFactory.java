@@ -1,6 +1,6 @@
 package java.factory;
 
-import java.security.InputValidator;
+import java.rpgSecurity.InputValidator;
 import java.util.logging.Logger;
 
 /**

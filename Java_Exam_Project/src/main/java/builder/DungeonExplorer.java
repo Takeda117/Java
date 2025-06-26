@@ -7,7 +7,7 @@ import java.factoryMonster.MonsterFactory;
 import java.iterator.Item;
 import java.observer.StaminaRecoverySystem;
 import java.logger.GameLogger;
-import java.security.ExceptionHandler;
+import java.rpgSecurity.ExceptionHandler;
 import java.util.logging.Logger;
 import java.util.Scanner;
 import java.util.List;

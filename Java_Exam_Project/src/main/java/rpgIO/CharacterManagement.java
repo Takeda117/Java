@@ -1,11 +1,12 @@
-package java.io;
+package java.rpgIO;
 
 import java.factory.Character;
 import java.factory.CharacterFactory;
 import java.factory.Mage;
+import java.io.*;
 import java.logger.GameLogger;
-import java.security.InputValidator;
-import java.security.ExceptionHandler;
+import java.rpgSecurity.InputValidator;
+import java.rpgSecurity.ExceptionHandler;
 
 import java.util.Properties;
 import java.util.logging.Logger;

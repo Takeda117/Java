@@ -1,6 +1,6 @@
 package java.composite;
 
-import java.security.InputValidator;
+import java.rpgSecurity.InputValidator;
 import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
 package java.factoryMonster;
 
 import java.logger.GameLogger;
-import java.security.ExceptionHandler;
+import java.rpgSecurity.ExceptionHandler;
 import java.util.logging.Logger;
 
 /**

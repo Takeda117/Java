@@ -1,6 +1,8 @@
 package java.menu;
 
-import composite.*;
+
+import java.composite.GameMenu;
+import java.composite.MenuItem;
 import java.factory.Character;
 import java.builder.ConcreteDungeonBuilder;
 import java.builder.Dungeon;
@@ -8,7 +10,7 @@ import java.builder.DungeonBuilder;
 import java.builder.DungeonExplorer;
 import java.menu.CharacterMenu.ReturnToMainMenuException;
 import java.logger.GameLogger;
-import java.security.ExceptionHandler;
+import java.rpgSecurity.ExceptionHandler;
 import java.util.logging.Logger;
 
 /**
