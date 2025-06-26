@@ -7,110 +7,49 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * GameUIObserver - Concrete implementation of StaminaObserver
- *
- * This class represents the "UI" part of our game that wants to know
- * when stamina changes happen. In a real game, this might update
- * health bars, show notifications, or trigger visual effects.
- *
- * Observer Pattern allows this UI class to react to stamina changes
- * without the Character classes needing to know about UI details.
+ * GameUIObserver - Implementazione concreta di StaminaObserver
+ * Rappresenta l'interfaccia utente che reagisce ai cambiamenti di stamina
  */
 public class GameUIObserver implements StaminaObserver {
 
     private static final Logger logger = GameLogger.getLogger();
-    private boolean showRecoveryMessages = true;
-    private List<Character> observedCharacters = new ArrayList<>();
+    private final List<Character> observedCharacters = new ArrayList<>();
 
     /**
-     * Constructor
+     * Costruttore
      */
     public GameUIObserver() {
-        logger.info("GameUIObserver created");
+        logger.info("GameUIObserver creato");
     }
 
     /**
-     * Called when a character's stamina changes
+     * Chiamato quando la stamina di un personaggio cambia
      */
     @Override
     public void onStaminaChanged(Character character, int oldStamina, int newStamina) {
-        try {
-            if (!observedCharacters.contains(character)) {
-                observedCharacters.add(character);
-            }
-            
-            int diff = newStamina - oldStamina;
-            String change = diff > 0 ? "increased" : "decreased";
-            
-            logger.info(String.format("%s's stamina %s: %d -> %d",
-                    character.getName(), change, oldStamina, newStamina));
-
-            // In a real game, this would update UI elements
-            if (Math.abs(diff) > 5) {
-                System.out.println("[UI] " + character.getName() + "'s stamina " + 
-                        change + " by " + Math.abs(diff));
-            }
-        } catch (Exception e) {
-            logger.warning("Error in onStaminaChanged: " + e.getMessage());
+        if (!observedCharacters.contains(character)) {
+            observedCharacters.add(character);
         }
+        
+        int diff = newStamina - oldStamina;
+        String change = diff > 0 ? "aumentata" : "diminuita";
+        
+        System.out.println("[UI] " + character.getName() + " stamina " + 
+                change + " di " + Math.abs(diff));
+        
+        logger.info(character.getName() + " stamina " + change + ": " + oldStamina + " -> " + newStamina);
     }
 
     /**
-     * Called when automatic stamina recovery occurs
+     * Chiamato quando la stamina viene recuperata automaticamente
      */
     @Override
     public void onStaminaRecovered(Character character, int recoveredAmount) {
-        try {
-            if (!observedCharacters.contains(character)) {
-                observedCharacters.add(character);
-            }
-            
-            if (showRecoveryMessages && recoveredAmount > 0) {
-                // Only show recovery messages if enabled and something was recovered
-                System.out.println("💚 " + character.getName() +
-                        " naturally recovers " + recoveredAmount + " stamina");
-            }
-
-            // Always log for debugging
-            logger.info(String.format("Auto-recovery: %s gained %d stamina",
-                    character.getName(), recoveredAmount));
-
-        } catch (Exception e) {
-            logger.warning("Error in onStaminaRecovered: " + e.getMessage());
+        if (!observedCharacters.contains(character)) {
+            observedCharacters.add(character);
         }
-    }
-
-    /**
-     * Enable or disable recovery messages
-     */
-    public void setShowRecoveryMessages(boolean show) {
-        this.showRecoveryMessages = show;
-        logger.info("Recovery messages " + (show ? "enabled" : "disabled"));
-    }
-    
-    /**
-     * Notifica tutti i personaggi osservati di un evento
-     * Implementazione del pattern Observer
-     */
-    public void notifyObservers(String message) {
-        logger.info("Notifying all observers: " + message);
         
-        for (Character character : observedCharacters) {
-            try {
-                System.out.println("[UI Notification] " + character.getName() + ": " + message);
-            } catch (Exception e) {
-                logger.warning("Error notifying character: " + e.getMessage());
-            }
-        }
-    }
-    
-    /**
-     * Notifica un personaggio specifico
-     */
-    public void notifyObserver(Character character, String message) {
-        if (character != null && observedCharacters.contains(character)) {
-            logger.info("Notifying observer " + character.getName() + ": " + message);
-            System.out.println("[UI Notification] " + character.getName() + ": " + message);
-        }
+        System.out.println("[UI] " + character.getName() + " recupera " + recoveredAmount + " stamina");
+        logger.info(character.getName() + " recupera " + recoveredAmount + " stamina");
     }
 }

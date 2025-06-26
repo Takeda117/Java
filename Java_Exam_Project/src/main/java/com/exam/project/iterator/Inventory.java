@@ -24,11 +24,8 @@ public class Inventory implements Iterable<Item> {
      * Constructor with configurable capacity
      */
     public Inventory(int maxCapacity) {
-        if (maxCapacity <= 0) {
-            throw new IllegalArgumentException("Inventory capacity must be positive");
-        }
-
-        this.maxCapacity = maxCapacity;
+        // Ignoriamo il parametro maxCapacity poiché non c'è più un limite
+        this.maxCapacity = Integer.MAX_VALUE; // Impostiamo un valore molto alto
         this.items = new ArrayList<>();
         this.equippedItems = new HashMap<>();
     }
@@ -37,23 +34,20 @@ public class Inventory implements Iterable<Item> {
      * Default constructor with standard capacity
      */
     public Inventory() {
-        this(20); // Default capacity of 20 items
+        this(Integer.MAX_VALUE); // Impostiamo un valore molto alto
     }
 
+    
     /**
      * Adds an item to the inventory
-     * @return true if item was added, false if inventory is full
+     * @return true if item was added
      */
     public boolean addItem(Item item) {
         if (item == null) {
             throw new IllegalArgumentException("Cannot add null item to inventory");
         }
 
-        if (items.size() >= maxCapacity) {
-            System.out.println("Inventory is full! Cannot add " + item.getName());
-            return false;
-        }
-
+        // Rimuovo il controllo sulla capacità massima
         items.add(item);
         System.out.println("Added " + item.getName() + " to inventory");
         return true;
@@ -214,7 +208,7 @@ public class Inventory implements Iterable<Item> {
      */
     public void displayInventory() {
         System.out.println("\n=== INVENTORY ===");
-        System.out.println("Capacity: " + items.size() + "/" + maxCapacity);
+        System.out.println("Total items: " + items.size());
         System.out.println("Total value: " + getTotalValue() + " gold");
 
         if (items.isEmpty()) {
@@ -265,11 +259,11 @@ public class Inventory implements Iterable<Item> {
     }
 
     public int getMaxCapacity() {
-        return maxCapacity;
+        return Integer.MAX_VALUE; // Restituiamo un valore molto alto
     }
 
     public boolean isFull() {
-        return items.size() >= maxCapacity;
+        return false; // L'inventario non è mai pieno
     }
 
     public boolean isEmpty() {

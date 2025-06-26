@@ -1,40 +1,37 @@
 package com.exam.project.builder;
 
 /**
- * DungeonBuilder Interface - Builder Pattern
- *
- * Questa interfaccia definisce i metodi per costruire un Dungeon.
- * Permette diverse implementazioni del builder per diversi tipi di dungeon.
+ * DungeonBuilder - Interfaccia per il Builder Pattern
  */
 public interface DungeonBuilder {
-
+    
     /**
-     * Imposta il nome del dungeon (obbligatorio)
+     * Resetta il builder
+     */
+    DungeonBuilder reset();
+    
+    /**
+     * Imposta il nome del dungeon
      */
     DungeonBuilder setName(String name);
-
+    
     /**
      * Imposta la descrizione del dungeon
      */
     DungeonBuilder setDescription(String description);
-
+    
     /**
-     * Imposta il reward in oro
+     * Imposta la ricompensa in oro del dungeon
      */
-    DungeonBuilder setGoldReward(int gold);
-
+    DungeonBuilder setGoldReward(int goldReward);
+    
     /**
-     * Imposta il tipo di mostro che spawna
+     * Imposta il tipo di mostro del dungeon
      */
     DungeonBuilder setMonsterType(String monsterType);
-
+    
     /**
-     * Costruisce e restituisce il Dungeon finale
+     * Costruisce e restituisce il dungeon
      */
     Dungeon build();
-
-    /**
-     * Reset del builder per riutilizzo
-     */
-    DungeonBuilder reset();
 }

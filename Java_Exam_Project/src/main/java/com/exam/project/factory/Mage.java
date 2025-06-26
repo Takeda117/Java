@@ -10,8 +10,8 @@ import java.util.Random;
 public class Mage extends AbstractCharacter {
 
   private static final Random random = new Random();
-  private int mana;
-  private int maxMana;
+  int mana;
+  int maxMana;
   private final Inventory inventory;
 
   /**

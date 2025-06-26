@@ -1,8 +1,6 @@
 package com.exam.project.factory;
 
 import com.exam.project.security.InputValidator;
-
-import java.lang.reflect.Field;
 import java.util.logging.Logger;
 
 /**
@@ -38,13 +36,19 @@ public class CharacterFactory {
         sanitizedType = sanitizedType.toLowerCase();
         
         // Create character based on type
-        if (sanitizedType.equals("warrior")) {
-            return new Warrior(validatedName);
-        } else if (sanitizedType.equals("mage")) {
-            return new Mage(validatedName);
-        } else {
-            logger.warning("Character creation failed: invalid type: " + sanitizedType);
-            System.out.println("Invalid character type!");
+        try {
+            if (sanitizedType.equals("warrior")) {
+                return new Warrior(validatedName);
+            } else if (sanitizedType.equals("mage")) {
+                return new Mage(validatedName);
+            } else {
+                logger.warning("Character creation failed: invalid type: " + sanitizedType);
+                System.out.println("Invalid character type!");
+                return null;
+            }
+        } catch (Exception e) {
+            logger.severe("Error creating character: " + e.getMessage());
+            System.out.println("Error creating character: " + e.getMessage());
             return null;
         }
     }
@@ -63,27 +67,31 @@ public class CharacterFactory {
      */
     public Character createCustomCharacter(String type, String name, int health, int maxHealth, 
                                           int stamina, int maxStamina, int baseDamage, int money, int level) {
-        Character character = createCharacter(type, name);
-        
-        if (character == null) {
+        // Validate inputs
+        String validatedName = InputValidator.validateCharacterName(name);
+        if (validatedName == null) {
+            logger.warning("Custom character creation failed: invalid name");
             return null;
         }
         
-        // Usa reflection per impostare i valori
         try {
-            Class<?> clazz = AbstractCharacter.class;
-            setFieldValue(character, clazz, "health", health);
-            setFieldValue(character, clazz, "maxHealth", maxHealth);
-            setFieldValue(character, clazz, "stamina", stamina);
-            setFieldValue(character, clazz, "maxStamina", maxStamina);
-            setFieldValue(character, clazz, "baseDamage", baseDamage);
-            setFieldValue(character, clazz, "money", money);
-            setFieldValue(character, clazz, "level", level);
+            // Create character with custom values
+            if (type.equalsIgnoreCase("warrior")) {
+                Warrior warrior = new Warrior(validatedName);
+                customizeCharacter(warrior, health, maxHealth, stamina, maxStamina, baseDamage, money, level);
+                return warrior;
+            } else if (type.equalsIgnoreCase("mage")) {
+                Mage mage = new Mage(validatedName);
+                customizeCharacter(mage, health, maxHealth, stamina, maxStamina, baseDamage, money, level);
+                return mage;
+            } else {
+                logger.warning("Custom character creation failed: invalid type: " + type);
+                return null;
+            }
         } catch (Exception e) {
-            // Ignora errori di reflection
+            logger.warning("Error creating custom character: " + e.getMessage());
+            return null;
         }
-        
-        return character;
     }
     
     /**
@@ -91,40 +99,41 @@ public class CharacterFactory {
      */
     public Character createCustomMage(String name, int health, int maxHealth, int stamina, int maxStamina,
                                      int baseDamage, int money, int level, int mana, int maxMana) {
-        Character character = createCharacter("mage", name);
-        
-        if (character == null) {
+        // Validate name
+        String validatedName = InputValidator.validateCharacterName(name);
+        if (validatedName == null) {
+            logger.warning("Custom mage creation failed: invalid name");
             return null;
         }
         
-        // Usa reflection per impostare i valori
         try {
-            Class<?> abstractClass = AbstractCharacter.class;
-            setFieldValue(character, abstractClass, "health", health);
-            setFieldValue(character, abstractClass, "maxHealth", maxHealth);
-            setFieldValue(character, abstractClass, "stamina", stamina);
-            setFieldValue(character, abstractClass, "maxStamina", maxStamina);
-            setFieldValue(character, abstractClass, "baseDamage", baseDamage);
-            setFieldValue(character, abstractClass, "money", money);
-            setFieldValue(character, abstractClass, "level", level);
+            // Create and customize mage
+            Mage mage = new Mage(validatedName);
+            customizeCharacter(mage, health, maxHealth, stamina, maxStamina, baseDamage, money, level);
             
-            // Imposta i valori specifici del mago
-            Class<?> mageClass = Mage.class;
-            setFieldValue(character, mageClass, "mana", mana);
-            setFieldValue(character, mageClass, "maxMana", maxMana);
+            // Set mage-specific values
+            mage.mana = Math.max(0, mana);
+            mage.maxMana = Math.max(1, maxMana);
+            
+            return mage;
         } catch (Exception e) {
-            // Ignora errori di reflection
+            logger.warning("Error creating custom mage: " + e.getMessage());
+            return null;
         }
-        
-        return character;
     }
     
     /**
-     * Utility method per impostare un campo tramite reflection
+     * Helper method to customize character attributes
      */
-    private void setFieldValue(Object obj, Class<?> clazz, String fieldName, Object value) throws Exception {
-        Field field = clazz.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        field.set(obj, value);
+    private void customizeCharacter(AbstractCharacter character, int health, int maxHealth, 
+                                   int stamina, int maxStamina, int baseDamage, int money, int level) {
+        // Set values directly (safe because we're in the same package)
+        character.health = Math.max(0, health);
+        character.maxHealth = Math.max(1, maxHealth);
+        character.stamina = Math.max(0, stamina);
+        character.maxStamina = Math.max(1, maxStamina);
+        character.baseDamage = Math.max(1, baseDamage);
+        character.money = Math.max(0, money);
+        character.level = Math.max(1, level);
     }
 }
