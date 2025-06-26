@@ -60,6 +60,29 @@ public class DungeonFactory {
     }
 
     /**
+     * Create Ancient Crypt using Builder Pattern
+     */
+    public static Dungeon createAncientCrypt() {
+        try {
+            logger.info("Creating Ancient Crypt dungeon");
+            return builder.reset()
+                    .setName("Ancient Crypt")
+                    .setDescription("Un'antica cripta piena di non morti. Attenzione alle trappole.")
+                    .setGoldReward(120)
+                    .setMonsterType("skeleton")
+                    .build();
+
+        } catch (Exception e) {
+            logger.severe("Error creating Ancient Crypt: " + e.getMessage());
+            // Emergency fallback
+            return builder.reset()
+                    .setName("Emergency Crypt")
+                    .setMonsterType("skeleton")
+                    .build();
+        }
+    }
+
+    /**
      * Mostra i 2 dungeon disponibili
      */
     public static void showAvailableDungeons() {

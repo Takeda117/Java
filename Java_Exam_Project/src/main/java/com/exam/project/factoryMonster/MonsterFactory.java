@@ -1,5 +1,6 @@
 package com.exam.project.factoryMonster;
 
+import com.exam.project.iterator.Item;
 import com.exam.project.logger.GameLogger;
 import java.util.Random;
 import java.util.logging.Logger;
@@ -24,7 +25,7 @@ public class MonsterFactory {
             return null;
         }
         
-        // Assicurati che difficulty sia in un range valido
+        // Ensure difficulty is in valid range
         int safeDifficulty = Math.max(1, Math.min(3, difficulty));
         if (safeDifficulty != difficulty) {
             logger.warning("Invalid difficulty level adjusted: " + difficulty + " -> " + safeDifficulty);
@@ -36,7 +37,16 @@ public class MonsterFactory {
             switch (cleanType) {
                 case "goblin":
                     try {
-                        Goblin goblin = new Goblin(safeDifficulty);
+                        // Use the generic Monster class for goblins
+                        String name = generateGoblinName();
+                        int health = 15 + (safeDifficulty * 5);
+                        int damage = 3 + safeDifficulty;
+                        int goldDrop = 10 + (safeDifficulty * 5);
+                        
+                        Monster goblin = new Monster(name, "Goblin", health, damage, goldDrop);
+                        
+
+                        
                         logger.info("Goblin created: " + goblin.getName());
                         return goblin;
                     } catch (Exception e) {
@@ -46,6 +56,7 @@ public class MonsterFactory {
 
                 case "troll":
                     try {
+
                         Troll troll = new Troll(safeDifficulty);
                         logger.info("Troll created: " + troll.getName());
                         return troll;
@@ -53,6 +64,7 @@ public class MonsterFactory {
                         logger.severe("Failed to create Troll: " + e.getMessage());
                         return null;
                     }
+
 
                 default:
                     logger.warning("Unknown monster type requested: " + type);
@@ -106,5 +118,13 @@ public class MonsterFactory {
             logger.warning("Error displaying monster types: " + e.getMessage());
             System.out.println("Error showing monster info!");
         }
+    }
+
+    /**
+     * Generate a random goblin name
+     */
+    private String generateGoblinName() {
+        String[] names = {"Gruk", "Zik", "Mog", "Blat", "Grizz", "Snot", "Gnarl", "Skiz", "Fizzle", "Grump"};
+        return names[random.nextInt(names.length)];
     }
 }

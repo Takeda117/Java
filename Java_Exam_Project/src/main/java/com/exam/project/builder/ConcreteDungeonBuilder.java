@@ -74,8 +74,8 @@ public class ConcreteDungeonBuilder implements DungeonBuilder {
                 this.monsterType = "goblin";
             } else {
                 String cleanType = monsterType.trim().toLowerCase();
-                // Valida solo goblin e troll
-                if (cleanType.equals("goblin") || cleanType.equals("troll")) {
+                // Validate goblin, troll, and skeleton
+                if (cleanType.equals("goblin") || cleanType.equals("troll") || cleanType.equals("skeleton")) {
                     this.monsterType = cleanType;
                 } else {
                     logger.warning("Unknown monster type: " + monsterType + ", using goblin");

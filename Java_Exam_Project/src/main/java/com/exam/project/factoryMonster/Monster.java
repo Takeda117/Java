@@ -8,122 +8,61 @@ import java.util.Random;
 /**
  * Monster - Represents an enemy that players fight in dungeons
  *
- * Monsters have simpler stats than characters but can drop items
+ * This class now properly extends AbstractMonster to avoid duplication
+ * and ensure consistent behavior across all monster types.
  */
-public class Monster {
-
-    private String name;
-    private String type;
-    private int health;
-    private int maxHealth;
-    private int damage;
-    private int goldDrop;
-    private List<Item> possibleDrops;
-    private Random random = new Random();
+public class Monster extends AbstractMonster {
 
     /**
      * Constructor for creating a monster
      */
     public Monster(String name, String type, int health, int damage, int goldDrop) {
-        this.name = name;
-        this.type = type;
-        this.health = health;
-        this.maxHealth = health;
-        this.damage = damage;
-        this.goldDrop = goldDrop;
-        this.possibleDrops = new ArrayList<>();
+        // Call the AbstractMonster constructor with a default drop chance of 30%
+        super(name, type, health, damage, goldDrop, 30);
     }
 
     /**
-     * Monster attacks - simpler than character attack
+     * Simplified attack method that uses the base implementation
      */
+    @Override
     public int attack() {
-        // Monsters have some variance in their damage
-        int variance = random.nextInt(3) - 1; // -1 to +1
-        int totalDamage = damage + variance;
-
-        System.out.printf("%s attacks for %d damage!%n", name, totalDamage);
-        return Math.max(1, totalDamage); // At least 1 damage
+        // Use the base implementation from AbstractMonster
+        return super.attack();
     }
 
     /**
-     * Take damage from player
+     * Take damage from player - uses the base implementation
      */
+    @Override
     public void takeDamage(int damage) {
-        if (damage < 0) {
-            return;
-        }
-
-        this.health = Math.max(0, this.health - damage);
-        System.out.printf("%s takes %d damage! Health: %d/%d%n",
-                name, damage, health, maxHealth);
-
-        if (!isAlive()) {
-            System.out.printf("%s has been defeated!%n", name);
-        }
+        // Use the base implementation from AbstractMonster
+        super.takeDamage(damage);
     }
 
     /**
-     * Check if monster is still alive
+     * Add a possible item drop - uses the base implementation
      */
-    public boolean isAlive() {
-        return health > 0;
-    }
-
-    /**
-     * Add a possible item drop
-     */
+    @Override
     public void addPossibleDrop(Item item) {
-        if (item != null) {
-            possibleDrops.add(item);
-        }
+        // Use the base implementation from AbstractMonster
+        super.addPossibleDrop(item);
     }
 
     /**
-     * Get items dropped when defeated
+     * Get items dropped when defeated - uses the base implementation
      * Not all items are guaranteed to drop
      */
+    @Override
     public List<Item> getDroppedItems() {
-        List<Item> drops = new ArrayList<>();
-
-        for (Item item : possibleDrops) {
-            // 30% chance to drop each item
-            if (random.nextInt(100) < 30) {
-                drops.add(item);
-            }
-        }
-
-        return drops;
+        // Use the base implementation from AbstractMonster
+        return super.getDroppedItems();
     }
 
-    // Getters
-    public String getName() {
-        return name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public int getHealth() {
-        return health;
-    }
-
-    public int getMaxHealth() {
-        return maxHealth;
-    }
-
-    public int getDamage() {
-        return damage;
-    }
-
-    public int getGoldDrop() {
-        return goldDrop;
-    }
-
+    /**
+     * Simple toString implementation that uses the base implementation
+     */
     @Override
     public String toString() {
-        return String.format("%s %s [HP: %d/%d, Damage: %d, Gold: %d]",
-                type, name, health, maxHealth, damage, goldDrop);
+        return super.toString();
     }
 }
