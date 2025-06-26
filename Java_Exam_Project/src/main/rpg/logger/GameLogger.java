@@ -21,14 +21,17 @@ import java.util.logging.SimpleFormatter;
  * <p>
  * Usage example:
  * <pre>
- * private static final Logger logger = GameLogger.getLogger();
+ * private static final Logger logger = GameLogger.getInstance().getLogger();
  * logger.info("Game component initialized");
  * </pre>
  * </p>
  */
 public class GameLogger {
 
-    private static final Logger logger = createLogger();
+    // Single instance of GameLogger (Singleton pattern)
+    private static volatile GameLogger instance;
+    
+    private final Logger logger;
 
     /**
      * Private constructor - Singleton pattern
@@ -38,6 +41,28 @@ public class GameLogger {
      * </p>
      */
     private GameLogger() {
+        this.logger = createLogger();
+    }
+
+    /**
+     * Gets the singleton GameLogger instance
+     * <p>
+     * This method implements the Singleton pattern with double-checked locking
+     * for thread safety. It ensures that only one instance of GameLogger is
+     * created and used throughout the application.
+     * </p>
+     * 
+     * @return The singleton GameLogger instance
+     */
+    public static GameLogger getInstance() {
+        if (instance == null) {
+            synchronized (GameLogger.class) {
+                if (instance == null) {
+                    instance = new GameLogger();
+                }
+            }
+        }
+        return instance;
     }
 
     /**
@@ -72,7 +97,7 @@ public class GameLogger {
     }
 
     /**
-     * Gets the singleton logger instance
+     * Gets the logger instance
      * <p>
      * This method provides access to the centralized logger instance
      * that should be used throughout the application for all logging needs.
@@ -80,7 +105,7 @@ public class GameLogger {
      * 
      * @return Logger instance configured for the game
      */
-    public static Logger getLogger() {
+    public Logger getLogger() {
         return logger;
     }
 }
